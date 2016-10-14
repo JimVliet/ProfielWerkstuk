@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using ProfielWerkstuk.Scripts;
 using System.Windows.Forms;
+using System;
 
 
 //Mijn profielwerkstuk
@@ -26,6 +27,20 @@ namespace ProfielWerkstuk
 		{
 			graphics = new GraphicsDeviceManager(this);
 			Content.RootDirectory = "Content";
+			graphics.PreparingDeviceSettings += graphics_PreparingDeviceSettings;
+		}
+
+		private void graphics_PreparingDeviceSettings(object sender, PreparingDeviceSettingsEventArgs e)
+		{
+			Form form = (Form)Form.FromHandle(Window.Handle);
+
+			//Setup antialiasing and 
+			graphics.PreferMultiSampling = true;
+			graphics.GraphicsProfile = GraphicsProfile.HiDef;
+			graphics.SynchronizeWithVerticalRetrace = true;
+			graphics.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
+			e.GraphicsDeviceInformation.PresentationParameters.MultiSampleCount = 16;
+			this.Window.AllowUserResizing = true;
 		}
 
 		/// <summary>
@@ -46,10 +61,8 @@ namespace ProfielWerkstuk
 			Form form = (Form)Form.FromHandle(Window.Handle);
 			form.WindowState = System.Windows.Forms.FormWindowState.Maximized;
 
-			//Match the resolution to the resolution of the screen.
 			graphics.PreferredBackBufferWidth = form.ClientSize.Width;
 			graphics.PreferredBackBufferHeight = form.ClientSize.Height;
-			this.Window.AllowUserResizing = true;
 			graphics.ApplyChanges();
 
 			//Create camera
@@ -148,7 +161,7 @@ namespace ProfielWerkstuk
 
 			//Draw UI
 			spriteBatch.Begin();
-			UI.DrawButton(spriteBatch, "Button", 28f, new Vector2(100, 50), font);
+			UI.DrawButton(spriteBatch, "Button", 32f, new Vector2(100, 50), font);
 			spriteBatch.End();
 
 			base.Draw(gameTime);
