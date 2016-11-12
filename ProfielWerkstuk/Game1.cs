@@ -1,10 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended;
-using ProfielWerkstuk.Scripts;
 using System.Windows.Forms;
-using System;
+using ProfielWerkstuk.Scripts.Camera;
+using ProfielWerkstuk.Scripts.Grid;
+using ProfielWerkstuk.Scripts.GUI;
 
 
 //Mijn profielwerkstuk
@@ -15,32 +15,33 @@ namespace ProfielWerkstuk
 	/// </summary>
 	public class Game1 : Game
 	{
-		GraphicsDeviceManager graphics;
-		SpriteBatch spriteBatch;
-		Camera2D camera;
-		private MouseState oldState;
-		Vector2 previousMouse = new Vector2();
-		Grid grid;
-		SpriteFont font;
+		public GraphicsDeviceManager Graphics;
+		public SpriteBatch SpriteBatch;
+		private MouseState _oldState;
+		public Vector2 PreviousMouse;
+		public Grid Grid;
+		public SpriteFont Font;
+
+		public CameraManager CameraManager;
 
 		public Game1()
 		{
-			graphics = new GraphicsDeviceManager(this);
+			Graphics = new GraphicsDeviceManager(this);
 			Content.RootDirectory = "Content";
-			graphics.PreparingDeviceSettings += graphics_PreparingDeviceSettings;
+			Graphics.PreparingDeviceSettings += graphics_PreparingDeviceSettings;
 		}
 
 		private void graphics_PreparingDeviceSettings(object sender, PreparingDeviceSettingsEventArgs e)
 		{
-			Form form = (Form)Form.FromHandle(Window.Handle);
+			//Form form = (Form)Control.FromHandle(Window.Handle);
 
 			//Setup antialiasing and 
-			graphics.PreferMultiSampling = true;
-			graphics.GraphicsProfile = GraphicsProfile.HiDef;
-			graphics.SynchronizeWithVerticalRetrace = true;
-			graphics.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
+			Graphics.PreferMultiSampling = true;
+			Graphics.GraphicsProfile = GraphicsProfile.HiDef;
+			Graphics.SynchronizeWithVerticalRetrace = true;
+			Graphics.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
 			e.GraphicsDeviceInformation.PresentationParameters.MultiSampleCount = 16;
-			this.Window.AllowUserResizing = true;
+			Window.AllowUserResizing = true;
 		}
 
 		/// <summary>
@@ -52,23 +53,20 @@ namespace ProfielWerkstuk
 		protected override void Initialize()
 		{
 			IsMouseVisible = true;
-			grid = new Grid(this, 64, 30, 20, 3);
+			Grid = new Grid(this, 64, 30, 20, 3);
 
 			// TODO: Add your initialization logic here
-			grid.generateTextures();
+			Grid.GenerateTextures();
 			base.Initialize();
 
-			Form form = (Form)Form.FromHandle(Window.Handle);
-			form.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+			Form form = (Form)Control.FromHandle(Window.Handle);
+			form.WindowState = FormWindowState.Maximized;
 
-			graphics.PreferredBackBufferWidth = form.ClientSize.Width;
-			graphics.PreferredBackBufferHeight = form.ClientSize.Height;
-			graphics.ApplyChanges();
+			Graphics.PreferredBackBufferWidth = form.ClientSize.Width;
+			Graphics.PreferredBackBufferHeight = form.ClientSize.Height;
+			Graphics.ApplyChanges();
 
-			//Create camera
-			camera = new Camera2D(GraphicsDevice);
-			camera.MinimumZoom = 0.7f;
-			camera.MaximumZoom = 3f;
+			CameraManager = new CameraManager(GraphicsDevice, this);
 		}
 
 		/// <summary>
@@ -78,8 +76,8 @@ namespace ProfielWerkstuk
 		protected override void LoadContent()
 		{
 			// Create a new SpriteBatch, which can be used to draw textures.
-			spriteBatch = new SpriteBatch(GraphicsDevice);
-			font = Content.Load<SpriteFont>("Calibri16");
+			SpriteBatch = new SpriteBatch(GraphicsDevice);
+			Font = Content.Load<SpriteFont>("Calibri16");
 			// TODO: use this.Content to load your game content here
 		}
 
@@ -90,9 +88,9 @@ namespace ProfielWerkstuk
 		protected override void UnloadContent()
 		{
 			// TODO: Unload any non ContentManager content here
-			grid.Dispose();
-			spriteBatch.Dispose();
-			graphics.Dispose();
+			Grid.Dispose();
+			SpriteBatch.Dispose();
+			Graphics.Dispose();
 		}
 
 		/// <summary>
@@ -109,34 +107,15 @@ namespace ProfielWerkstuk
 
 			// TODO: Add your update logic here
 
-			if(System.Windows.Forms.Form.ActiveForm == (System.Windows.Forms.Control.FromHandle(Window.Handle) as System.Windows.Forms.Form))
+			if(Form.ActiveForm == (Control.FromHandle(Window.Handle) as Form))
 			{
-				if(oldState != null)
-				{
-					if (mouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed)
-					{
-						if(oldState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Released)
-						{
-							previousMouse.X = mouseState.X;
-							previousMouse.Y = mouseState.Y;
-						}
-						else if(oldState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed)
-						{
-							camera.Move((previousMouse - new Vector2(mouseState.X, mouseState.Y))/camera.Zoom);
-							previousMouse.X = mouseState.X;
-							previousMouse.Y = mouseState.Y;
-						}
-					}
+				CameraManager.CheckPanning(mouseState, _oldState, PreviousMouse);
+				CameraManager.CheckScroll(mouseState, _oldState);
 
-					int deltaScroll = mouseState.ScrollWheelValue - oldState.ScrollWheelValue;
-					if (deltaScroll != 0)
-						if (deltaScroll < 0)
-							camera.ZoomOut(0.1f*(-deltaScroll/120f));
-						else
-							camera.ZoomIn(0.1f*(deltaScroll/120f));
-				}
+				PreviousMouse.X = mouseState.X;
+				PreviousMouse.Y = mouseState.Y;
 				//Update old mousestate
-				oldState = mouseState;
+				_oldState = mouseState;
 			}
 			
 
@@ -152,17 +131,15 @@ namespace ProfielWerkstuk
 			GraphicsDevice.Clear(Color.WhiteSmoke);
 			// TODO: Add your drawing code 
 
-			Vector2 screenOffset = new Vector2(GraphicsDevice.DisplayMode.Width / 2, GraphicsDevice.DisplayMode.Height/2);
-
-			spriteBatch.Begin(transformMatrix: camera.GetViewMatrix());
-			grid.DrawGridLines(spriteBatch);
-			grid.DrawGridSquares(spriteBatch);
-			spriteBatch.End();
+			SpriteBatch.Begin(transformMatrix: CameraManager.Camera.GetViewMatrix());
+			Grid.DrawGridLines(SpriteBatch);
+			Grid.DrawGridSquares(SpriteBatch);
+			SpriteBatch.End();
 
 			//Draw UI
-			spriteBatch.Begin();
-			UI.DrawButton(spriteBatch, "Button", 32f, new Vector2(100, 50), font);
-			spriteBatch.End();
+			SpriteBatch.Begin();
+			UserInterface.DrawButton(SpriteBatch, "Button", 32f, new Vector2(100, 50), Font);
+			SpriteBatch.End();
 
 			base.Draw(gameTime);
 		}
