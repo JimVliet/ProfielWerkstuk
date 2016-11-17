@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Windows.Forms;
 using ProfielWerkstuk.Scripts.Camera;
 using ProfielWerkstuk.Scripts.Grid;
-using ProfielWerkstuk.Scripts.GUI;
+using Button = ProfielWerkstuk.Scripts.GUI.Button;
 
 
 //Mijn profielwerkstuk
@@ -20,8 +20,9 @@ namespace ProfielWerkstuk
 		private MouseState _oldState;
 		public Vector2 PreviousMouse;
 		public Grid Grid;
-		public SpriteFont Font;
-
+		public SpriteFont Font28;
+		public SpriteFont Font24;
+		public Scripts.GUI.Menu TestMenu;
 		public CameraManager CameraManager;
 
 		public Game1()
@@ -67,6 +68,15 @@ namespace ProfielWerkstuk
 			Graphics.ApplyChanges();
 
 			CameraManager = new CameraManager(GraphicsDevice, this);
+			TestMenu = new Scripts.GUI.Menu(new Vector2(form.ClientSize.Width/2, form.ClientSize.Height/2));
+
+			Button exitButton = new Scripts.GUI.Button(Font28, new Vector2(), "Exit")
+			{
+				ButtonSize = {X = 250f}
+			};
+
+			TestMenu.AddButton(exitButton);
+			TestMenu.AddButton(new Scripts.GUI.Button(Font28, new Vector2(), "Back"));
 		}
 
 		/// <summary>
@@ -77,7 +87,8 @@ namespace ProfielWerkstuk
 		{
 			// Create a new SpriteBatch, which can be used to draw textures.
 			SpriteBatch = new SpriteBatch(GraphicsDevice);
-			Font = Content.Load<SpriteFont>("Calibri16");
+			Font28 = Content.Load<SpriteFont>("Raleway28");
+			Font24 = Content.Load<SpriteFont>("Raleway24");
 			// TODO: use this.Content to load your game content here
 		}
 
@@ -102,8 +113,6 @@ namespace ProfielWerkstuk
 		{
 			KeyboardState state = Keyboard.GetState();
 			MouseState mouseState = Mouse.GetState();
-			if (state.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Escape))
-				Exit();
 
 			// TODO: Add your update logic here
 
@@ -118,7 +127,8 @@ namespace ProfielWerkstuk
 				_oldState = mouseState;
 			}
 			
-
+			if (state.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Escape))
+				Exit();
 			base.Update(gameTime);
 		}
 
@@ -137,8 +147,8 @@ namespace ProfielWerkstuk
 			SpriteBatch.End();
 
 			//Draw UI
-			SpriteBatch.Begin();
-			UserInterface.DrawButton(SpriteBatch, "Button", 32f, new Vector2(100, 50), Font);
+			SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
+			TestMenu.Draw(SpriteBatch);
 			SpriteBatch.End();
 
 			base.Draw(gameTime);

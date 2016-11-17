@@ -44,7 +44,9 @@
     <Compile Include="Scripts\Camera\CameraManager.cs" />
     <Compile Include="Scripts\Grid\Grid.cs" />
     <Compile Include="Scripts\GUI\Button.cs" />
-    <Compile Include="Scripts\GUI\UserInterface.cs" />
+    <Compile Include="Scripts\GUI\Menu.cs" />
+    <Compile Include="Scripts\GUI\MenuItem.cs" />
+    <Compile Include="Scripts\GUI\UserInterfaceManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Extended, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
