@@ -23,24 +23,20 @@ namespace ProfielWerkstuk.Scripts.Camera
 			MainGame = game;
 		}
 
-		public void CheckPanning(MouseState mouseState, MouseState oldState, Vector2 previousMouse)
+		public void CheckPanning(MouseState mouseState, MouseState oldState)
 		{
-			if (mouseState.LeftButton == ButtonState.Pressed && 
-				oldState.LeftButton == ButtonState.Pressed)
-			{
-				Vector2 updatedPosition = (previousMouse - new Vector2(mouseState.X, mouseState.Y))/Camera.Zoom + GetCameraCenterInWorld();
-				RectangleF bounds = MainGame.Grid.GridBounds;
-				updatedPosition.X = MathHelper.Clamp(updatedPosition.X, bounds.Left, bounds.Right);
-				updatedPosition.Y = MathHelper.Clamp(updatedPosition.Y, bounds.Top, bounds.Bottom);
+			Vector2 previousMouse = new Vector2(oldState.X, oldState.Y);
 
-				Camera.Move(updatedPosition - GetCameraCenterInWorld());
-			}
+			Vector2 updatedPosition = (previousMouse - new Vector2(mouseState.X, mouseState.Y)) / Camera.Zoom + GetCameraCenterInWorld();
+			RectangleF bounds = MainGame.Grid.GridBounds;
+			updatedPosition.X = MathHelper.Clamp(updatedPosition.X, bounds.Left, bounds.Right);
+			updatedPosition.Y = MathHelper.Clamp(updatedPosition.Y, bounds.Top, bounds.Bottom);
+
+			Camera.Move(updatedPosition - GetCameraCenterInWorld());
 		}
 
-		public void CheckScroll(MouseState mouseState, MouseState oldState)
+		public void CheckScroll(int deltaScroll)
 		{
-			int deltaScroll = mouseState.ScrollWheelValue - oldState.ScrollWheelValue;
-			if (deltaScroll == 0) return;
 			if (deltaScroll < 0)
 				Camera.ZoomOut(0.1f * (-deltaScroll / 120f));
 			else

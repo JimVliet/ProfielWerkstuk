@@ -1,6 +1,4 @@
-﻿// compile with: /doc:Button.xml
-
-using System;
+﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -12,12 +10,15 @@ namespace ProfielWerkstuk.Scripts.GUI
 		private readonly SpriteFont _font;
 		public Color ButtonColor = new Color(29, 114, 238);
 		public Color TextColor;
+		public Color ButtonHoverColor = new Color(51, 134, 255);
 
 		//Make sure LineBorderEnabled is set to true, or it won't have any effect
 		public Color LineColor;
 		public Vector2 Padding = new Vector2(20f, 20f);
 		public string Text;
 		public bool LineBorderEnabled;
+		public bool IsBeingHovered;
+		public ButtonClick ButtonClickedEvent;
 
 		public int LineWidth
 		{
@@ -68,10 +69,11 @@ namespace ProfielWerkstuk.Scripts.GUI
 
 		public void Draw(SpriteBatch spriteBatch, Vector2 position)
 		{
+			Color drawColor = IsBeingHovered ? ButtonHoverColor : ButtonColor;
 			Vector2 buttonSize = GetSize();
 			Vector2 drawPosition = position - (buttonSize / 2);
 
-			MonoGame.Extended.Shapes.SpriteBatchExtensions.FillRectangle(spriteBatch, drawPosition, buttonSize, ButtonColor);
+			MonoGame.Extended.Shapes.SpriteBatchExtensions.FillRectangle(spriteBatch, drawPosition, buttonSize, drawColor);
 			if(LineBorderEnabled)
 				MonoGame.Extended.Shapes.SpriteBatchExtensions.DrawRectangle(spriteBatch, drawPosition, buttonSize, LineColor, 4);
 
@@ -83,6 +85,9 @@ namespace ProfielWerkstuk.Scripts.GUI
 			spriteBatch.DrawString(_font, Text, textVector2, TextColor);
 		}
 
+		/// <summary>
+		/// This method gives the minimal button size
+		/// </summary>
 		/// <returns>Returns the minimal size of the button in order to prevent text outside the Button.</returns>
 		public Vector2 GetMinimalSize()
 		{
@@ -95,5 +100,17 @@ namespace ProfielWerkstuk.Scripts.GUI
 			return new Vector2(Math.Max(buttonMinimalSize.X, ButtonSize.X),
 				Math.Max(buttonMinimalSize.Y, ButtonSize.Y));
 		}
+
+		public Vector2 GetTopLeft(Vector2 pos)
+		{
+			return pos - (GetSize() / 2);
+		}
+
+		public Vector2 GetLowerRight(Vector2 pos)
+		{
+			return pos + (GetSize() / 2);
+		}
 	}
+
+	public delegate void ButtonClick(Button button, Vector2 clickLocation);
 }

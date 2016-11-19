@@ -25,3 +25,9 @@
 /processorParam:TextureFormat=NoChange
 /build:Raleway28.spritefont
 
+#begin Raleway16.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=NoChange
+/build:Raleway16.spritefont
+

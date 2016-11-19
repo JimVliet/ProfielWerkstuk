@@ -13,6 +13,10 @@ namespace ProfielWerkstuk.Scripts.GUI
 		private readonly List<MenuItem> _buttonList = new List<MenuItem>();
 		public Vector2 Margin = new Vector2(25f, 25f);
 		public float BaseButtonDistance = 25f;
+		public bool IsActive = true;
+		public bool IsBeingDisabled;
+		public bool AllowClicking = true;
+		public MenuActivated MenuActivated;
 
 		public Menu(Vector2 pos)
 		{
@@ -89,5 +93,37 @@ namespace ProfielWerkstuk.Scripts.GUI
 			ResetButtonWidth();
 			return true;
 		}
+
+		public Vector2 GetTopLeft()
+		{
+			return Position - (_size/2);
+		}
+
+		public Vector2 GetLowerRight()
+		{
+			return Position + (_size / 2);
+		}
+
+		public List<MenuItem> GetMenuItems()
+		{
+			return _buttonList;
+		}
+
+		public List<Vector2> GetButtonPositions()
+		{
+			List<Vector2> vectorList = new List<Vector2>();
+
+			Vector2 drawPosition = Position - (_size / 2) + Margin;
+			foreach (MenuItem item in _buttonList)
+			{
+				Vector2 itemSize = item.Data.GetSize();
+				vectorList.Add(new Vector2(Position.X, drawPosition.Y + item.UpperMargin + itemSize.Y / 2));
+				drawPosition.Y += itemSize.Y + item.LowerMargin + item.UpperMargin + BaseButtonDistance;
+			}
+
+			return vectorList;
+		}
 	}
+
+	public delegate void MenuActivated(Menu menu);
 }

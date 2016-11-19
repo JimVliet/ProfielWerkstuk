@@ -1,11 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using System.Windows.Forms;
 using ProfielWerkstuk.Scripts.Camera;
+using ProfielWerkstuk.Scripts.Events;
 using ProfielWerkstuk.Scripts.Grid;
+using ProfielWerkstuk.Scripts.GUI;
 using Button = ProfielWerkstuk.Scripts.GUI.Button;
-
+using Menu = ProfielWerkstuk.Scripts.GUI.Menu;
+using Keys = Microsoft.Xna.Framework.Input.Keys;
 
 //Mijn profielwerkstuk
 namespace ProfielWerkstuk
@@ -17,13 +19,10 @@ namespace ProfielWerkstuk
 	{
 		public GraphicsDeviceManager Graphics;
 		public SpriteBatch SpriteBatch;
-		private MouseState _oldState;
-		public Vector2 PreviousMouse;
 		public Grid Grid;
-		public SpriteFont Font28;
-		public SpriteFont Font24;
-		public Scripts.GUI.Menu TestMenu;
+		public UserInterfaceManager UserInterface;
 		public CameraManager CameraManager;
+		public InputManager InputManager;
 
 		public Game1()
 		{
@@ -68,15 +67,7 @@ namespace ProfielWerkstuk
 			Graphics.ApplyChanges();
 
 			CameraManager = new CameraManager(GraphicsDevice, this);
-			TestMenu = new Scripts.GUI.Menu(new Vector2(form.ClientSize.Width/2, form.ClientSize.Height/2));
-
-			Button exitButton = new Scripts.GUI.Button(Font28, new Vector2(), "Exit")
-			{
-				ButtonSize = {X = 250f}
-			};
-
-			TestMenu.AddButton(exitButton);
-			TestMenu.AddButton(new Scripts.GUI.Button(Font28, new Vector2(), "Back"));
+			UserInterface.Setup();
 		}
 
 		/// <summary>
@@ -85,10 +76,14 @@ namespace ProfielWerkstuk
 		/// </summary>
 		protected override void LoadContent()
 		{
+			InputManager = new InputManager(this);
+			UserInterface = new UserInterfaceManager(this);
+
 			// Create a new SpriteBatch, which can be used to draw textures.
 			SpriteBatch = new SpriteBatch(GraphicsDevice);
-			Font28 = Content.Load<SpriteFont>("Raleway28");
-			Font24 = Content.Load<SpriteFont>("Raleway24");
+			UserInterface.Font28 = Content.Load<SpriteFont>("Raleway28");
+			UserInterface.Font24 = Content.Load<SpriteFont>("Raleway24");
+			UserInterface.Font16 = Content.Load<SpriteFont>("Raleway16");
 			// TODO: use this.Content to load your game content here
 		}
 
@@ -111,24 +106,13 @@ namespace ProfielWerkstuk
 		/// <param name="gameTime">Provides a snapshot of timing values.</param>
 		protected override void Update(GameTime gameTime)
 		{
-			KeyboardState state = Keyboard.GetState();
-			MouseState mouseState = Mouse.GetState();
-
 			// TODO: Add your update logic here
 
 			if(Form.ActiveForm == (Control.FromHandle(Window.Handle) as Form))
 			{
-				CameraManager.CheckPanning(mouseState, _oldState, PreviousMouse);
-				CameraManager.CheckScroll(mouseState, _oldState);
-
-				PreviousMouse.X = mouseState.X;
-				PreviousMouse.Y = mouseState.Y;
-				//Update old mousestate
-				_oldState = mouseState;
+				InputManager.Update();
 			}
 			
-			if (state.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Escape))
-				Exit();
 			base.Update(gameTime);
 		}
 
@@ -148,7 +132,7 @@ namespace ProfielWerkstuk
 
 			//Draw UI
 			SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
-			TestMenu.Draw(SpriteBatch);
+			UserInterface.Draw(SpriteBatch);
 			SpriteBatch.End();
 
 			base.Draw(gameTime);
