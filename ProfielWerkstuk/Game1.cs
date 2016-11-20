@@ -1,13 +1,12 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Drawing;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Windows.Forms;
 using ProfielWerkstuk.Scripts.Camera;
 using ProfielWerkstuk.Scripts.Events;
 using ProfielWerkstuk.Scripts.Grid;
 using ProfielWerkstuk.Scripts.GUI;
-using Button = ProfielWerkstuk.Scripts.GUI.Button;
-using Menu = ProfielWerkstuk.Scripts.GUI.Menu;
-using Keys = Microsoft.Xna.Framework.Input.Keys;
+using Color = Microsoft.Xna.Framework.Color;
 
 //Mijn profielwerkstuk
 namespace ProfielWerkstuk
@@ -53,10 +52,10 @@ namespace ProfielWerkstuk
 		protected override void Initialize()
 		{
 			IsMouseVisible = true;
-			Grid = new Grid(this, 64, 30, 20, 3);
+			Grid = new Grid(this, 64, 30, 20, 2);
+			Grid.GenerateGrid();
 
 			// TODO: Add your initialization logic here
-			Grid.GenerateTextures();
 			base.Initialize();
 
 			Form form = (Form)Control.FromHandle(Window.Handle);
@@ -64,6 +63,7 @@ namespace ProfielWerkstuk
 
 			Graphics.PreferredBackBufferWidth = form.ClientSize.Width;
 			Graphics.PreferredBackBufferHeight = form.ClientSize.Height;
+			form.MinimumSize = new Size(form.ClientSize.Width , form.ClientSize.Height);
 			Graphics.ApplyChanges();
 
 			CameraManager = new CameraManager(GraphicsDevice, this);
@@ -94,7 +94,6 @@ namespace ProfielWerkstuk
 		protected override void UnloadContent()
 		{
 			// TODO: Unload any non ContentManager content here
-			Grid.Dispose();
 			SpriteBatch.Dispose();
 			Graphics.Dispose();
 		}

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using ProfielWerkstuk.Scripts.Grid;
 using ProfielWerkstuk.Scripts.GUI;
 using ProfielWerkstuk.Scripts.Utility;
 
@@ -45,7 +46,6 @@ namespace ProfielWerkstuk.Scripts.Events
 			foreach (Menu menu in menuList)
 			{
 				List<MenuItem> itemList = menu.GetMenuItems();
-				List<Vector2> buttonPositions = menu.GetButtonPositions();
 				foreach (MenuItem item in itemList)
 				{
 					Button button = item.Data;
@@ -113,19 +113,35 @@ namespace ProfielWerkstuk.Scripts.Events
 		{
 			Vector2 clickLocation = new Vector2(MouseState.X, MouseState.Y);
 
-			if (Game.UserInterface.ClickEvent(clickLocation))
-			{
-				_validLeftClick = true;
-			}
-			else
-				_validLeftClick = false;
+			_validLeftClick = Game.UserInterface.ClickEvent(clickLocation);
 			//Store the new lastLeftClick location
 			LastLeftClick = clickLocation;
 		}
 
 		public void LeftReleaseEvent()
 		{
+			if(!_validLeftClick)
+				return;
 
+			Vector2 clickLocation = new Vector2(MouseState.X, MouseState.Y);
+			Vector2 deltaClick = clickLocation - LastLeftClick;
+
+			if(deltaClick.Length() > 2)
+				return;
+
+			GridElement element = Game.Grid.GetGridElement(clickLocation);
+			if (element != null)
+			{
+				switch (element.Type)
+				{
+					case GridElementType.Empty:
+						element.Type = GridElementType.Solid;
+						break;
+					case GridElementType.Solid:
+						element.Type = GridElementType.Empty;
+						break;
+				}
+			}
 		}
 
 		public void LeftDragEvent()

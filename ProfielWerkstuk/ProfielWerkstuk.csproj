@@ -72,6 +72,7 @@
     <Compile Include="Scripts\Camera\CameraManager.cs" />
     <Compile Include="Scripts\Events\InputManager.cs" />
     <Compile Include="Scripts\Grid\Grid.cs" />
+    <Compile Include="Scripts\Grid\GridElement.cs" />
     <Compile Include="Scripts\GUI\Button.cs" />
     <Compile Include="Scripts\GUI\Menu.cs" />
     <Compile Include="Scripts\GUI\MenuItem.cs" />
