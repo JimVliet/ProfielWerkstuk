@@ -12,6 +12,7 @@ namespace ProfielWerkstuk.Scripts.Events
 		public Vector2 LastLeftClick;
 		public Game1 Game;
 		private bool _validLeftClick;
+		public GridElement DragElement;
 		public MouseState MouseState;
 		public KeyboardState KeyboardState;
 		public MouseState OldMouseState;
@@ -114,6 +115,16 @@ namespace ProfielWerkstuk.Scripts.Events
 			Vector2 clickLocation = new Vector2(MouseState.X, MouseState.Y);
 
 			_validLeftClick = Game.UserInterface.ClickEvent(clickLocation);
+
+			if (_validLeftClick)
+			{
+				GridElement element = Game.Grid.GetGridElement(clickLocation);
+				if (element != null && (element.Type == GridElementType.Start || element.Type == GridElementType.End))
+				{
+					DragElement = element;
+				}
+			}
+
 			//Store the new lastLeftClick location
 			LastLeftClick = clickLocation;
 		}
@@ -124,14 +135,27 @@ namespace ProfielWerkstuk.Scripts.Events
 				return;
 
 			Vector2 clickLocation = new Vector2(MouseState.X, MouseState.Y);
-			Vector2 deltaClick = clickLocation - LastLeftClick;
 
-			if(deltaClick.Length() > 2)
-				return;
-
-			GridElement element = Game.Grid.GetGridElement(clickLocation);
-			if (element != null)
+			if (DragElement != null)
 			{
+				GridElement element = Game.Grid.GetGridElement(clickLocation);
+				if (element != null && element.Type != GridElementType.End && element.Type != GridElementType.Start)
+				{
+					element.Type = DragElement.Type;
+					DragElement.Type = GridElementType.Empty;
+				}
+
+				DragElement = null;
+			}
+			else
+			{
+				Vector2 deltaClick = clickLocation - LastLeftClick;
+
+				if(deltaClick.Length() > 2)
+					return;
+
+				GridElement element = Game.Grid.GetGridElement(clickLocation);
+				if (element == null) return;
 				switch (element.Type)
 				{
 					case GridElementType.Empty:
@@ -142,11 +166,14 @@ namespace ProfielWerkstuk.Scripts.Events
 						break;
 				}
 			}
+
+			
 		}
 
 		public void LeftDragEvent()
 		{
-			Game.CameraManager.CheckPanning(MouseState, OldMouseState);
+			if (DragElement == null)
+				Game.CameraManager.CheckPanning(MouseState, OldMouseState);
 		}
 	}
 }

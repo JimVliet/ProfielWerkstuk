@@ -11,12 +11,10 @@
 			X = x;
 			Y = y;
 		}
-
-
 	}
 
 	public enum GridElementType
 	{
-		Empty, Solid
+		Empty, Solid, Start, End
 	}
 }

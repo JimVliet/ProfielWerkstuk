@@ -119,7 +119,6 @@ namespace ProfielWerkstuk.Scripts.GUI
 					{
 						button.ButtonClickedEvent?.Invoke(button, clickLocation);
 					}
-							
 				}
 
 				isOutsideMenus = false;

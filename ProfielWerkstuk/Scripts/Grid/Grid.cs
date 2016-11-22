@@ -38,7 +38,8 @@ namespace ProfielWerkstuk.Scripts.Grid
 
 		public void GenerateGrid()
 		{
-			
+			GridElements[HalfHeight, HalfWidth/2].Type = GridElementType.Start;
+			GridElements[HalfHeight, HalfWidth + HalfWidth/2].Type = GridElementType.End;
 		}
 
 		public void DrawGridSquares(SpriteBatch spriteBatch)
@@ -53,6 +54,37 @@ namespace ProfielWerkstuk.Scripts.Grid
 
 				if(element.Type == GridElementType.Solid)
 					spriteBatch.FillRectangle(GetGridVector2(x, y, stepRate), new Vector2(GridSize, GridSize), Color.DarkGray);
+				else if (element.Type == GridElementType.Start)
+				{
+					if (Game.InputManager.DragElement?.Type == GridElementType.Start)
+						spriteBatch.FillRectangle(GetGridVector2(x, y, stepRate), new Vector2(GridSize, GridSize), new Color(0, 161, 0));
+					else
+						spriteBatch.FillRectangle(GetGridVector2(x, y, stepRate), new Vector2(GridSize, GridSize), Color.Green);
+				}
+				else if (element.Type == GridElementType.End)
+				{
+					if (Game.InputManager.DragElement?.Type == GridElementType.End)
+						spriteBatch.FillRectangle(GetGridVector2(x, y, stepRate), new Vector2(GridSize, GridSize), new Color(255, 66, 66));
+					else
+						spriteBatch.FillRectangle(GetGridVector2(x, y, stepRate), new Vector2(GridSize, GridSize), Color.Red);
+				}
+			}
+
+			Vector2 mouseLocation = new Vector2(Game.InputManager.MouseState.X, Game.InputManager.MouseState.Y);
+			GridElement targetElement = GetGridElement(mouseLocation);
+			GridElement dragElement = Game.InputManager.DragElement;
+			if (targetElement != null && targetElement.Type != GridElementType.Start 
+				&& targetElement.Type != GridElementType.End)
+			{
+				switch (dragElement?.Type)
+				{
+					case GridElementType.Start:
+						spriteBatch.FillRectangle(GetGridVector2(targetElement.X, targetElement.Y, stepRate), new Vector2(GridSize, GridSize), Color.Green);
+						break;
+					case GridElementType.End:
+						spriteBatch.FillRectangle(GetGridVector2(targetElement.X, targetElement.Y, stepRate), new Vector2(GridSize, GridSize), Color.Red);
+						break;
+				}
 			}
 		}
 
@@ -97,7 +129,7 @@ namespace ProfielWerkstuk.Scripts.Grid
 			Vector2 correctedPos = worldPos + new Vector2(stepRate*HalfWidth, stepRate*HalfHeight);
 			int xIndex = (int)(correctedPos.X / stepRate);
 			int yIndex = (int)(correctedPos.Y / stepRate);
-			if (xIndex < HalfWidth*2 && yIndex < HalfHeight*2)
+			if (xIndex >= 0 && xIndex < HalfWidth*2 && yIndex >= 0 && yIndex < HalfHeight*2)
 				return GridElements[yIndex, xIndex];
 
 			return null;
