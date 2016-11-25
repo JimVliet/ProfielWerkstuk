@@ -4,9 +4,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace ProfielWerkstuk.Scripts.GUI
 {
-	public class Button
+	public class Button : IMenuItem
 	{
-		public Vector2 ButtonSize;
 		private readonly SpriteFont _font;
 		public Color ButtonColor = new Color(29, 114, 238);
 		public Color TextColor;
@@ -17,8 +16,9 @@ namespace ProfielWerkstuk.Scripts.GUI
 		public Vector2 Padding = new Vector2(20f, 20f);
 		public string Text;
 		public bool LineBorderEnabled;
-		public bool IsBeingHovered;
-		public ButtonClick ButtonClickedEvent;
+		public Vector2 Size { get; set; }
+		public bool IsBeingHovered { get; set; }
+		public ClickEvent ClickedEvent { get; set; }
 
 		public int LineWidth
 		{
@@ -32,7 +32,7 @@ namespace ProfielWerkstuk.Scripts.GUI
 		public Button(SpriteFont font, Vector2 size, string text)
 		{
 			_font = font;
-			ButtonSize = size;
+			Size = size;
 			TextColor = Color.White;
 			Text = text;
 		}
@@ -40,7 +40,7 @@ namespace ProfielWerkstuk.Scripts.GUI
 		public Button(SpriteFont font, Vector2 size, string text, Color buttonColor)
 		{
 			_font = font;
-			ButtonSize = size;
+			Size = size;
 			ButtonColor = buttonColor;
 			TextColor = Color.White;
 			Text = text;
@@ -49,7 +49,7 @@ namespace ProfielWerkstuk.Scripts.GUI
 		public Button(SpriteFont font, Vector2 size, string text, Color buttonColor, Color textColor)
 		{
 			_font = font;
-			ButtonSize = size;
+			Size = size;
 			ButtonColor = buttonColor;
 			TextColor = textColor;
 			Text = text;
@@ -58,7 +58,7 @@ namespace ProfielWerkstuk.Scripts.GUI
 		public Button(SpriteFont font, Vector2 size, string text, Color buttonColor, Color textColor, Color lineColor)
 		{
 			_font = font;
-			ButtonSize = size;
+			Size = size;
 			ButtonColor = buttonColor;
 			TextColor = textColor;
 			LineColor = lineColor;
@@ -97,8 +97,8 @@ namespace ProfielWerkstuk.Scripts.GUI
 		public Vector2 GetSize()
 		{
 			Vector2 buttonMinimalSize = GetMinimalSize();
-			return new Vector2(Math.Max(buttonMinimalSize.X, ButtonSize.X),
-				Math.Max(buttonMinimalSize.Y, ButtonSize.Y));
+			return new Vector2(Math.Max(buttonMinimalSize.X, Size.X),
+				Math.Max(buttonMinimalSize.Y, Size.Y));
 		}
 
 		public Vector2 GetTopLeft(Vector2 pos)
@@ -112,5 +112,5 @@ namespace ProfielWerkstuk.Scripts.GUI
 		}
 	}
 
-	public delegate void ButtonClick(Button button, Vector2 clickLocation);
+	public delegate void ClickEvent(IMenuItem item, Vector2 clickLocation);
 }

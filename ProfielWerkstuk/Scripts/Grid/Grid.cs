@@ -52,39 +52,40 @@ namespace ProfielWerkstuk.Scripts.Grid
 				int y = index / (2 * HalfWidth);
 				GridElement element = GridElements[y, x];
 
-				if(element.Type == GridElementType.Solid)
-					spriteBatch.FillRectangle(GetGridVector2(x, y, stepRate), new Vector2(GridSize, GridSize), Color.DarkGray);
-				else if (element.Type == GridElementType.Start)
+				switch (element.Type)
 				{
-					if (Game.InputManager.DragElement?.Type == GridElementType.Start)
-						spriteBatch.FillRectangle(GetGridVector2(x, y, stepRate), new Vector2(GridSize, GridSize), new Color(0, 161, 0));
-					else
-						spriteBatch.FillRectangle(GetGridVector2(x, y, stepRate), new Vector2(GridSize, GridSize), Color.Green);
-				}
-				else if (element.Type == GridElementType.End)
-				{
-					if (Game.InputManager.DragElement?.Type == GridElementType.End)
-						spriteBatch.FillRectangle(GetGridVector2(x, y, stepRate), new Vector2(GridSize, GridSize), new Color(255, 66, 66));
-					else
-						spriteBatch.FillRectangle(GetGridVector2(x, y, stepRate), new Vector2(GridSize, GridSize), Color.Red);
+					case GridElementType.Solid:
+						spriteBatch.FillRectangle(GetGridVector2(x, y, stepRate), new Vector2(GridSize, GridSize), Color.DarkGray);
+						break;
+					case GridElementType.Start:
+						if (Game.InputManager.DragElement?.Type == GridElementType.Start)
+							spriteBatch.FillRectangle(GetGridVector2(x, y, stepRate), new Vector2(GridSize, GridSize), new Color(0, 161, 0));
+						else
+							spriteBatch.FillRectangle(GetGridVector2(x, y, stepRate), new Vector2(GridSize, GridSize), Color.Green);
+						break;
+					case GridElementType.End:
+						if (Game.InputManager.DragElement?.Type == GridElementType.End)
+							spriteBatch.FillRectangle(GetGridVector2(x, y, stepRate), new Vector2(GridSize, GridSize), new Color(255, 66, 66));
+						else
+							spriteBatch.FillRectangle(GetGridVector2(x, y, stepRate), new Vector2(GridSize, GridSize), Color.Red);
+						break;
 				}
 			}
 
 			Vector2 mouseLocation = new Vector2(Game.InputManager.MouseState.X, Game.InputManager.MouseState.Y);
 			GridElement targetElement = GetGridElement(mouseLocation);
 			GridElement dragElement = Game.InputManager.DragElement;
-			if (targetElement != null && targetElement.Type != GridElementType.Start 
-				&& targetElement.Type != GridElementType.End)
+			if (targetElement == null || dragElement == null || ((targetElement.Type == GridElementType.Start || targetElement.Type == GridElementType.End)
+				 && targetElement.Type != dragElement.Type))
+				return;
+			switch (dragElement.Type)
 			{
-				switch (dragElement?.Type)
-				{
-					case GridElementType.Start:
-						spriteBatch.FillRectangle(GetGridVector2(targetElement.X, targetElement.Y, stepRate), new Vector2(GridSize, GridSize), Color.Green);
-						break;
-					case GridElementType.End:
-						spriteBatch.FillRectangle(GetGridVector2(targetElement.X, targetElement.Y, stepRate), new Vector2(GridSize, GridSize), Color.Red);
-						break;
-				}
+				case GridElementType.Start:
+					spriteBatch.FillRectangle(GetGridVector2(targetElement.X, targetElement.Y, stepRate), new Vector2(GridSize, GridSize), Color.Green);
+					break;
+				case GridElementType.End:
+					spriteBatch.FillRectangle(GetGridVector2(targetElement.X, targetElement.Y, stepRate), new Vector2(GridSize, GridSize), Color.Red);
+					break;
 			}
 		}
 

@@ -49,7 +49,7 @@ namespace ProfielWerkstuk.Scripts.Events
 				List<MenuItem> itemList = menu.GetMenuItems();
 				foreach (MenuItem item in itemList)
 				{
-					Button button = item.Data;
+					IMenuItem button = item.Data;
 					button.IsBeingHovered = false;
 				}
 			}
@@ -63,7 +63,7 @@ namespace ProfielWerkstuk.Scripts.Events
 				List<Vector2> buttonPositions = menu.GetButtonPositions();
 				for (int i = 0; i < itemList.Count; i++)
 				{
-					Button button = itemList[i].Data;
+					IMenuItem button = itemList[i].Data;
 					if (Utilities.IsPointWithin(mouseLocation, button.GetTopLeft(buttonPositions[i]),
 						button.GetLowerRight(buttonPositions[i])))
 						button.IsBeingHovered = true;

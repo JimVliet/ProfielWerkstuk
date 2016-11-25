@@ -53,13 +53,18 @@ namespace ProfielWerkstuk.Scripts.GUI
 
 			foreach (MenuItem item in _buttonList)
 			{
-				item.Data.ButtonSize.X = maxWidth;
+				item.Data.Size = new Vector2(maxWidth, item.Data.Size.Y);
 			}
 		}
 
 		public void Draw(SpriteBatch spriteBatch)
 		{
-			MonoGame.Extended.Shapes.SpriteBatchExtensions.FillRectangle(spriteBatch, Position - (_size/2), _size, MenuColor);
+			Vector2 drawPos = Position - _size/2;
+			//Prevents weird anti-aliasing
+			drawPos.X = (int)drawPos.X;
+			drawPos.Y = (int)drawPos.Y;
+
+			MonoGame.Extended.Shapes.SpriteBatchExtensions.FillRectangle(spriteBatch, drawPos, _size, MenuColor);
 
 			if(_buttonList.Count  == 0)
 				return;
@@ -72,16 +77,16 @@ namespace ProfielWerkstuk.Scripts.GUI
 			}
 		}
 
-		public void AddButton(Button button)
+		public void AddMenuItem(IMenuItem item)
 		{
-			_buttonList.Add(new MenuItem(button));
+			_buttonList.Add(new MenuItem(item));
 			_size = GetMenuSize();
 			ResetButtonWidth();
 		}
 
 		public Button GetButton(int pos)
 		{
-			return _buttonList.Count > pos ? _buttonList[pos].Data : null;
+			return _buttonList.Count > pos ? (Button)_buttonList[pos].Data : null;
 		}
 
 		public bool RemoveButton(int index)

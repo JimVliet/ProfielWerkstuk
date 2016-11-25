@@ -41,23 +41,23 @@ namespace ProfielWerkstuk.Scripts.GUI
 
 			Button exitButton = new Button(Font28, new Vector2(), "Exit")
 			{
-				ButtonSize = { X = 250f },
-				ButtonClickedEvent = (button, location) =>
+				ClickedEvent = (button, location) =>
 				{
 					Game.Exit();
 				}
 			};
+			exitButton.Size = new Vector2(250f, exitButton.Size.Y);
 
 			Button backButton = new Button(Font28, new Vector2(), "Back")
 			{
-				ButtonClickedEvent = (button, location) =>
+				ClickedEvent = (button, location) =>
 				{
 					mainMenu.MenuActivated?.Invoke(mainMenu);
 				}
 			};
 
-			mainMenu.AddButton(exitButton);
-			mainMenu.AddButton(backButton);
+			mainMenu.AddMenuItem(exitButton);
+			mainMenu.AddMenuItem(backButton);
 
 			//Setup option panel
 			Menu optionMenu = CreateMenu(new Vector2());
@@ -69,16 +69,16 @@ namespace ProfielWerkstuk.Scripts.GUI
 			{
 				Padding = {Y = 10f}
 			};
-			optionMenu.AddButton(dijkstraButton);
+			optionMenu.AddMenuItem(dijkstraButton);
 
 			//Add button for A*
 			Button aStar = new Button(Font16, new Vector2(), "A*")
 			{
 				Padding = { Y = 10f }
 			};
-			optionMenu.AddButton(aStar);
+			optionMenu.AddMenuItem(aStar);
 
-			optionMenu.Position = new Vector2(windowWidth - (optionMenu.GetMenuSize().X / 2),
+			optionMenu.Position = new Vector2(windowWidth - optionMenu.GetMenuSize().X / 2,
 				optionMenu.GetMenuSize().Y / 2);
 
 			//Add escape notifier
@@ -88,13 +88,33 @@ namespace ProfielWerkstuk.Scripts.GUI
 			Button escapeButton = new Button(Font16, new Vector2(0, 0), "Menu")
 			{
 				Padding = new Vector2(5, 5),
-				ButtonClickedEvent = (button, location) =>
+				ClickedEvent = (button, location) =>
 				{
 					mainMenu.MenuActivated?.Invoke(mainMenu);
 				}
 			};
-			escapeMenu.AddButton(escapeButton);
+			escapeMenu.AddMenuItem(escapeButton);
 			escapeMenu.Position = escapeMenu.GetMenuSize()/2;
+
+			//Setup itemMenu
+			Menu itemMenu = CreateMenu(new Vector2(5,5));
+
+			//Create new button
+			Button kekButton = new Button(Font28, new Vector2(0, 0), "kek");
+
+			//Add new infoItem
+			InfoItem infoItem = new InfoItem(new Vector2());
+
+			//Add textElements to infoItem
+			InfoTextElement textElement = new InfoTextElement(infoItem, new Vector2(80, 80), new Vector2(), "Testing leleleelelelelelelele", Font16);
+			infoItem.AddInfoText(textElement);
+			InfoTextElement textElementKek = new InfoTextElement(infoItem, new Vector2(-80, -80), new Vector2(), "Testing", Font16);
+			infoItem.AddInfoText(textElementKek);
+
+			//Finish itemMenu setup
+			itemMenu.AddMenuItem(infoItem);
+			itemMenu.AddMenuItem(kekButton);
+			itemMenu.Position = new Vector2(windowWidth / 2, windowHeight / 2);
 		}
 
 		/// <summary>
@@ -114,10 +134,10 @@ namespace ProfielWerkstuk.Scripts.GUI
 				List<Vector2> buttonPositions = menu.GetButtonPositions();
 				for (int i = 0; i < itemList.Count; i++)
 				{
-					Button button = itemList[i].Data;
-					if (Utilities.IsPointWithin(clickLocation, button.GetTopLeft(buttonPositions[i]), button.GetLowerRight(buttonPositions[i])))
+					IMenuItem item = itemList[i].Data;
+					if (Utilities.IsPointWithin(clickLocation, item.GetTopLeft(buttonPositions[i]), item.GetLowerRight(buttonPositions[i])))
 					{
-						button.ButtonClickedEvent?.Invoke(button, clickLocation);
+						item.ClickedEvent?.Invoke(item, clickLocation);
 					}
 				}
 
