@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ProfielWerkstuk.Scripts.Events;
 
 namespace ProfielWerkstuk.Scripts.GUI
 {
@@ -17,7 +18,7 @@ namespace ProfielWerkstuk.Scripts.GUI
 		public string Text;
 		public bool LineBorderEnabled;
 		public Vector2 Size { get; set; }
-		public bool IsBeingHovered { get; set; }
+		public bool IsBeingHovered;
 		public ClickEvent ClickedEvent { get; set; }
 
 		public int LineWidth
@@ -85,6 +86,11 @@ namespace ProfielWerkstuk.Scripts.GUI
 			spriteBatch.DrawString(_font, Text, textVector2, TextColor);
 		}
 
+		public void Hover(bool hovered, Vector2 position, Vector2 mouseLocation)
+		{
+			IsBeingHovered = hovered;
+		}
+
 		/// <summary>
 		/// This method gives the minimal button size
 		/// </summary>
@@ -112,5 +118,4 @@ namespace ProfielWerkstuk.Scripts.GUI
 		}
 	}
 
-	public delegate void ClickEvent(IMenuItem item, Vector2 clickLocation);
 }

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ProfielWerkstuk.Scripts.Events;
+using ProfielWerkstuk.Scripts.Utility;
 
 namespace ProfielWerkstuk.Scripts.GUI
 {
@@ -10,7 +12,7 @@ namespace ProfielWerkstuk.Scripts.GUI
 		public Vector2 Position;
 		private Vector2 _size;
 		public Color MenuColor = new Color(34, 34, 34);
-		private readonly List<MenuItem> _buttonList = new List<MenuItem>();
+		private readonly List<MenuItem> _menuItemList = new List<MenuItem>();
 		public Vector2 Margin = new Vector2(25f, 25f);
 		public float BaseButtonDistance = 25f;
 		public bool IsActive = true;
@@ -27,9 +29,9 @@ namespace ProfielWerkstuk.Scripts.GUI
 		public Vector2 GetMenuSize()
 		{
 			float horizontalSize = 0;
-			float verticalSize = (_buttonList.Count-1) * BaseButtonDistance;
+			float verticalSize = (_menuItemList.Count-1) * BaseButtonDistance;
 
-			foreach (MenuItem item in _buttonList)
+			foreach (MenuItem item in _menuItemList)
 			{
 				Vector2 buttonSize = item.Data.GetSize();
 				horizontalSize = Math.Max(buttonSize.X, horizontalSize);
@@ -41,17 +43,17 @@ namespace ProfielWerkstuk.Scripts.GUI
 
 		public void ResetButtonWidth()
 		{
-			if (_buttonList.Count == 0)
+			if (_menuItemList.Count == 0)
 				return;
 
 			float maxWidth = 0;
 
-			foreach (MenuItem item in _buttonList)
+			foreach (MenuItem item in _menuItemList)
 			{
 				maxWidth = Math.Max(item.Data.GetSize().X, maxWidth);
 			}
 
-			foreach (MenuItem item in _buttonList)
+			foreach (MenuItem item in _menuItemList)
 			{
 				item.Data.Size = new Vector2(maxWidth, item.Data.Size.Y);
 			}
@@ -66,10 +68,10 @@ namespace ProfielWerkstuk.Scripts.GUI
 
 			MonoGame.Extended.Shapes.SpriteBatchExtensions.FillRectangle(spriteBatch, drawPos, _size, MenuColor);
 
-			if(_buttonList.Count  == 0)
+			if(_menuItemList.Count  == 0)
 				return;
 			Vector2 drawPosition = Position - (_size/2) + Margin;
-			foreach (MenuItem item in _buttonList)
+			foreach (MenuItem item in _menuItemList)
 			{
 				Vector2 itemSize = item.Data.GetSize();
 				item.Data.Draw(spriteBatch, new Vector2(Position.X, drawPosition.Y + item.UpperMargin + itemSize.Y/2));
@@ -79,21 +81,32 @@ namespace ProfielWerkstuk.Scripts.GUI
 
 		public void AddMenuItem(IMenuItem item)
 		{
-			_buttonList.Add(new MenuItem(item));
+			_menuItemList.Add(new MenuItem(item));
 			_size = GetMenuSize();
 			ResetButtonWidth();
 		}
 
+		public void Hover(Vector2 mouseLocation)
+		{
+			List<Vector2> buttonPositions = GetButtonPositions();
+			for (int i = 0; i < _menuItemList.Count; i++)
+			{
+				IMenuItem menuItem = _menuItemList[i].Data;
+				bool pointWithin = Utilities.IsPointWithin(mouseLocation, menuItem.GetTopLeft(buttonPositions[i]), menuItem.GetLowerRight(buttonPositions[i]));
+				menuItem.Hover(pointWithin, buttonPositions[i], mouseLocation);
+			}
+		}
+
 		public Button GetButton(int pos)
 		{
-			return _buttonList.Count > pos ? (Button)_buttonList[pos].Data : null;
+			return _menuItemList.Count > pos ? (Button)_menuItemList[pos].Data : null;
 		}
 
 		public bool RemoveButton(int index)
 		{
-			if(_buttonList.Count <= index)
+			if(_menuItemList.Count <= index)
 				return false;
-			_buttonList.RemoveAt(index);
+			_menuItemList.RemoveAt(index);
 			_size = GetMenuSize();
 			ResetButtonWidth();
 			return true;
@@ -111,7 +124,7 @@ namespace ProfielWerkstuk.Scripts.GUI
 
 		public List<MenuItem> GetMenuItems()
 		{
-			return _buttonList;
+			return _menuItemList;
 		}
 
 		public List<Vector2> GetButtonPositions()
@@ -119,7 +132,7 @@ namespace ProfielWerkstuk.Scripts.GUI
 			List<Vector2> vectorList = new List<Vector2>();
 
 			Vector2 drawPosition = Position - (_size / 2) + Margin;
-			foreach (MenuItem item in _buttonList)
+			foreach (MenuItem item in _menuItemList)
 			{
 				Vector2 itemSize = item.Data.GetSize();
 				vectorList.Add(new Vector2(Position.X, drawPosition.Y + item.UpperMargin + itemSize.Y / 2));
@@ -129,6 +142,4 @@ namespace ProfielWerkstuk.Scripts.GUI
 			return vectorList;
 		}
 	}
-
-	public delegate void MenuActivated(Menu menu);
 }

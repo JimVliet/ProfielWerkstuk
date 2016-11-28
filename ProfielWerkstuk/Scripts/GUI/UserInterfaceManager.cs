@@ -25,9 +25,15 @@ namespace ProfielWerkstuk.Scripts.GUI
 
 			//Setup mainmenu
 			Menu mainMenu = CreateMenu(new Vector2(windowWidth / 2f, windowHeight / 2f));
+			Game.InputManager.EscapeTriggerList.Add(mainMenu);
+			mainMenu.AllowClicking = false;
+			mainMenu.IsActive = false;
+
 			mainMenu.MenuActivated = main =>
 			{
 				main.IsActive = !main.IsActive;
+				main.IsBeingDisabled = !main.IsActive;
+				Game.InputManager.AllowDragging = !Game.InputManager.AllowDragging;
 
 				foreach (Menu menu in MenuList)
 				{
@@ -35,9 +41,6 @@ namespace ProfielWerkstuk.Scripts.GUI
 						menu.IsBeingDisabled = main.IsActive;
 				}
 			};
-			Game.InputManager.EscapeTriggerList.Add(mainMenu);
-			mainMenu.AllowClicking = false;
-			mainMenu.IsActive = false;
 
 			Button exitButton = new Button(Font28, new Vector2(), "Exit")
 			{
@@ -67,16 +70,20 @@ namespace ProfielWerkstuk.Scripts.GUI
 			//Add button for dijkstra
 			Button dijkstraButton = new Button(Font16, new Vector2(200, 20), "Dijkstra")
 			{
-				Padding = {Y = 10f}
+				Padding = {Y = 10f},
+				ClickedEvent = (item, location) =>
+				{
+					Game.AlgorithmManager.Calculate();
+				}
 			};
 			optionMenu.AddMenuItem(dijkstraButton);
 
 			//Add button for A*
-			Button aStar = new Button(Font16, new Vector2(), "A*")
-			{
-				Padding = { Y = 10f }
-			};
-			optionMenu.AddMenuItem(aStar);
+			//Button aStar = new Button(Font16, new Vector2(), "A*")
+			//{
+			//	Padding = { Y = 10f }
+			//};
+			//optionMenu.AddMenuItem(aStar);
 
 			optionMenu.Position = new Vector2(windowWidth - optionMenu.GetMenuSize().X / 2,
 				optionMenu.GetMenuSize().Y / 2);
@@ -97,24 +104,45 @@ namespace ProfielWerkstuk.Scripts.GUI
 			escapeMenu.Position = escapeMenu.GetMenuSize()/2;
 
 			//Setup itemMenu
-			Menu itemMenu = CreateMenu(new Vector2(5,5));
-
-			//Create new button
-			Button kekButton = new Button(Font28, new Vector2(0, 0), "kek");
+			Menu controlMenu = CreateMenu(new Vector2());
+			controlMenu.Margin = new Vector2(10,10);
 
 			//Add new infoItem
-			InfoItem infoItem = new InfoItem(new Vector2());
+			//InfoItem infoItem = new InfoItem(new Vector2());
 
 			//Add textElements to infoItem
-			InfoTextElement textElement = new InfoTextElement(infoItem, new Vector2(80, 80), new Vector2(), "Testing leleleelelelelelelele", Font16);
-			infoItem.AddInfoText(textElement);
-			InfoTextElement textElementKek = new InfoTextElement(infoItem, new Vector2(-80, -80), new Vector2(), "Testing", Font16);
-			infoItem.AddInfoText(textElementKek);
+			//InfoTextElement calculateElement = new InfoTextElement(new Vector2(0, -10), new Vector2(), "Calculating...", Font16)
+			//{
+			//	Padding = new Vector2(5, 5)
+			//};
+			//infoItem.AddInfoText(calculateElement);
+
+			//AllowDiagonal button
+			Button diagonal = new Button(Font16, new Vector2(200, 0), "Diagonaal", Color.Red)
+			{
+				ButtonHoverColor = new Color(255, 30, 30)
+			};
+
+			diagonal.ClickedEvent = (item, location) =>
+			{
+				if (Game.AlgorithmManager.AllowDiagonal)
+				{
+					Game.AlgorithmManager.AllowDiagonal = false;
+					diagonal.ButtonColor = Color.Red;
+					diagonal.ButtonHoverColor = new Color(255, 30, 30);
+				}
+				else
+				{
+					Game.AlgorithmManager.AllowDiagonal = true;
+					diagonal.ButtonColor = Color.Green;
+					diagonal.ButtonHoverColor = new Color(40, 128, 40);
+				}
+			};
 
 			//Finish itemMenu setup
-			itemMenu.AddMenuItem(infoItem);
-			itemMenu.AddMenuItem(kekButton);
-			itemMenu.Position = new Vector2(windowWidth / 2, windowHeight / 2);
+			//controlMenu.AddMenuItem(infoItem);
+			controlMenu.AddMenuItem(diagonal);
+			controlMenu.Position = new Vector2(windowWidth / 2, windowHeight - controlMenu.GetMenuSize().Y/2);
 		}
 
 		/// <summary>
@@ -123,7 +151,6 @@ namespace ProfielWerkstuk.Scripts.GUI
 		/// <returns>Returns true if the click location is outside any menus</returns>
 		public bool ClickEvent(Vector2 clickLocation)
 		{
-			bool isOutsideMenus = true;
 
 			foreach (Menu menu in MenuList)
 			{
@@ -138,13 +165,12 @@ namespace ProfielWerkstuk.Scripts.GUI
 					if (Utilities.IsPointWithin(clickLocation, item.GetTopLeft(buttonPositions[i]), item.GetLowerRight(buttonPositions[i])))
 					{
 						item.ClickedEvent?.Invoke(item, clickLocation);
+						return false;
 					}
 				}
-
-				isOutsideMenus = false;
 			}
 
-			return isOutsideMenus;
+			return true;
 		}
 
 		public void Draw(SpriteBatch spriteBatch)

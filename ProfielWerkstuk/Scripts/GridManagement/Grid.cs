@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Shapes;
 
-namespace ProfielWerkstuk.Scripts.Grid
+namespace ProfielWerkstuk.Scripts.GridManagement
 {
 	public class Grid
 	{
@@ -13,6 +13,9 @@ namespace ProfielWerkstuk.Scripts.Grid
 		public float LineWidth;
 		public RectangleF GridBounds;
 		public GridElement[,] GridElements;
+		public GridElementType GridHoldType = GridElementType.Null;
+		public GridElement StartElement;
+		public GridElement EndElement;
 
 		public Grid(Game1 game, int gridSize, int halfWidth, int halfHeight, int lineWidth)
 		{
@@ -38,14 +41,28 @@ namespace ProfielWerkstuk.Scripts.Grid
 
 		public void GenerateGrid()
 		{
-			GridElements[HalfHeight, HalfWidth/2].Type = GridElementType.Start;
-			GridElements[HalfHeight, HalfWidth + HalfWidth/2].Type = GridElementType.End;
+			StartElement = GridElements[HalfHeight, HalfWidth / 2];
+			EndElement = GridElements[HalfHeight, HalfWidth + HalfWidth / 2];
+			StartElement.Type = GridElementType.Start;
+			EndElement.Type = GridElementType.End;
+		}
+
+		public void ChangeStartElement(GridElement newElement)
+		{
+			StartElement.Type = GridElementType.Empty;
+			newElement.Type = GridElementType.Start;
+			StartElement = newElement;
+		}
+
+		public void ChangeEndElement(GridElement newElement)
+		{
+			EndElement.Type = GridElementType.Empty;
+			newElement.Type = GridElementType.End;
+			EndElement = newElement;
 		}
 
 		public void DrawGridSquares(SpriteBatch spriteBatch)
 		{
-			float stepRate = GetStepRate();
-
 			for (int index = 0; index < GridElements.Length; index++)
 			{
 				int x = index % (2 * HalfWidth);
@@ -55,19 +72,19 @@ namespace ProfielWerkstuk.Scripts.Grid
 				switch (element.Type)
 				{
 					case GridElementType.Solid:
-						spriteBatch.FillRectangle(GetGridVector2(x, y, stepRate), new Vector2(GridSize, GridSize), Color.DarkGray);
+						spriteBatch.FillRectangle(GetGridVector2(x, y), new Vector2(GridSize, GridSize), Color.DarkGray);
 						break;
 					case GridElementType.Start:
 						if (Game.InputManager.DragElement?.Type == GridElementType.Start)
-							spriteBatch.FillRectangle(GetGridVector2(x, y, stepRate), new Vector2(GridSize, GridSize), new Color(0, 161, 0));
+							spriteBatch.FillRectangle(GetGridVector2(x, y), new Vector2(GridSize, GridSize), new Color(0, 161, 0));
 						else
-							spriteBatch.FillRectangle(GetGridVector2(x, y, stepRate), new Vector2(GridSize, GridSize), Color.Green);
+							spriteBatch.FillRectangle(GetGridVector2(x, y), new Vector2(GridSize, GridSize), Color.Green);
 						break;
 					case GridElementType.End:
 						if (Game.InputManager.DragElement?.Type == GridElementType.End)
-							spriteBatch.FillRectangle(GetGridVector2(x, y, stepRate), new Vector2(GridSize, GridSize), new Color(255, 66, 66));
+							spriteBatch.FillRectangle(GetGridVector2(x, y), new Vector2(GridSize, GridSize), new Color(255, 66, 66));
 						else
-							spriteBatch.FillRectangle(GetGridVector2(x, y, stepRate), new Vector2(GridSize, GridSize), Color.Red);
+							spriteBatch.FillRectangle(GetGridVector2(x, y), new Vector2(GridSize, GridSize), Color.Red);
 						break;
 				}
 			}
@@ -81,10 +98,10 @@ namespace ProfielWerkstuk.Scripts.Grid
 			switch (dragElement.Type)
 			{
 				case GridElementType.Start:
-					spriteBatch.FillRectangle(GetGridVector2(targetElement.X, targetElement.Y, stepRate), new Vector2(GridSize, GridSize), Color.Green);
+					spriteBatch.FillRectangle(GetGridVector2(targetElement.X, targetElement.Y), new Vector2(GridSize, GridSize), Color.Green);
 					break;
 				case GridElementType.End:
-					spriteBatch.FillRectangle(GetGridVector2(targetElement.X, targetElement.Y, stepRate), new Vector2(GridSize, GridSize), Color.Red);
+					spriteBatch.FillRectangle(GetGridVector2(targetElement.X, targetElement.Y), new Vector2(GridSize, GridSize), Color.Red);
 					break;
 			}
 		}
@@ -116,8 +133,10 @@ namespace ProfielWerkstuk.Scripts.Grid
 			return GridSize + LineWidth / 2 + 1;
 		}
 
-		public Vector2 GetGridVector2(int x, int y, float stepRate)
+		public Vector2 GetGridVector2(int x, int y)
 		{
+			float stepRate = GetStepRate();
+
 			float xCoord = (stepRate * -HalfWidth) + (x * stepRate) + LineWidth / 2f;
 			float yCoord = (stepRate * -HalfHeight) + (y * stepRate) + LineWidth / 2f;
 			return new Vector2(xCoord, yCoord);
@@ -134,6 +153,36 @@ namespace ProfielWerkstuk.Scripts.Grid
 				return GridElements[yIndex, xIndex];
 
 			return null;
+		}
+
+		public void GridClicked(Vector2 clickLocation)
+		{
+			GridElement element = GetGridElement(clickLocation);
+			if (element == null)
+				return;
+			switch (element.Type)
+			{
+				case GridElementType.Empty:
+					element.Type = GridElementType.Solid;
+					break;
+				case GridElementType.Solid:
+					element.Type = GridElementType.Empty;
+					break;
+			}
+		}
+
+		public void GridHoldClick(Vector2 mouseLocation)
+		{
+			GridElement element = GetGridElement(mouseLocation);
+			if(element == null)
+				return;
+			if (GridHoldType == GridElementType.Null)
+			{
+				GridHoldType = element.Type == GridElementType.Empty ? GridElementType.Solid : GridElementType.Empty;
+				return;
+			}
+
+			element.Type = GridHoldType;
 		}
 	}
 }

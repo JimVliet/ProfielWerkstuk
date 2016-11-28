@@ -9,5 +9,11 @@ namespace ProfielWerkstuk.Scripts.Utility
 			return point.X >= topLeft.X && point.X <= bottomRight.X
 				   && point.Y >= topLeft.Y && point.Y <= bottomRight.Y;
 		}
+
+		public static bool IsCollinear(int xOne, int yOne, int xTwo, int yTwo, int xThree, int yThree)
+		{
+			//Check if the area of the triangle is equal to 0
+			return xOne * (yTwo - yThree) + xTwo * (yThree - yOne) + xThree * (yOne - yTwo) == 0;
+		}
 	}
 }

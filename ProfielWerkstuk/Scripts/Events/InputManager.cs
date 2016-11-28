@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using ProfielWerkstuk.Scripts.Grid;
+using ProfielWerkstuk.Scripts.GridManagement;
 using ProfielWerkstuk.Scripts.GUI;
 using ProfielWerkstuk.Scripts.Utility;
 
@@ -18,6 +18,7 @@ namespace ProfielWerkstuk.Scripts.Events
 		public MouseState OldMouseState;
 		public KeyboardState OldKeyboardState;
 		public List<Menu> EscapeTriggerList = new List<Menu>();
+		public bool AllowDragging = true;
 
 		public InputManager(Game1 game)
 		{
@@ -28,45 +29,63 @@ namespace ProfielWerkstuk.Scripts.Events
 		{
 			KeyboardState = Keyboard.GetState();
 			MouseState = Mouse.GetState();
+			Vector2 clickLocation = new Vector2(MouseState.X, MouseState.Y);
 
-			CheckClickEvent();
+			CheckClickEvent(clickLocation);
+			CheckRightClickEvent(clickLocation);
+			CheckMouseHover(clickLocation);
 			CheckScroll();
 			EscapePushed();
-			CheckMouseHover();
 
 			OldMouseState = MouseState;
 			OldKeyboardState = KeyboardState;
 		}
 
-		public void CheckMouseHover()
+		public void CheckRightClickEvent(Vector2 clickLocation)
 		{
-			Vector2 mouseLocation = new Vector2(MouseState.X, MouseState.Y);
+			if (MouseState.RightButton == ButtonState.Pressed)
+			{
+				if (OldMouseState.RightButton == ButtonState.Pressed)
+					RightMouseHold(clickLocation);
+				else
+					RightMouseClick(clickLocation);
+			}
+			else if (OldMouseState.RightButton == ButtonState.Pressed)
+				RightMouseRelease(clickLocation);
+		}
+
+		public void RightMouseRelease(Vector2 clickLocation)
+		{
+			Game.Grid.GridHoldType = GridElementType.Null;
+		}
+
+		public void RightMouseHold(Vector2 clickLocation)
+		{
+			Game.Grid.GridHoldClick(clickLocation);
+		}
+
+		public void RightMouseClick(Vector2 clickLocation)
+		{
+			
+		}
+
+		public void CheckMouseHover(Vector2 mouseLocation)
+		{
 			List<Menu> menuList = Game.UserInterface.MenuList;
 
-			//Disable all old hovers
 			foreach (Menu menu in menuList)
 			{
-				List<MenuItem> itemList = menu.GetMenuItems();
-				foreach (MenuItem item in itemList)
-				{
-					IMenuItem button = item.Data;
-					button.IsBeingHovered = false;
-				}
-			}
-
-			foreach (Menu menu in menuList)
-			{
-				if (menu.IsBeingDisabled || !menu.IsActive || !Utilities.IsPointWithin(mouseLocation, menu.GetTopLeft(), menu.GetLowerRight()))
-					continue;
+				bool disabled = menu.IsBeingDisabled || !menu.IsActive ||
+				                !Utilities.IsPointWithin(mouseLocation, menu.GetTopLeft(), menu.GetLowerRight());
 
 				List<MenuItem> itemList = menu.GetMenuItems();
 				List<Vector2> buttonPositions = menu.GetButtonPositions();
 				for (int i = 0; i < itemList.Count; i++)
 				{
-					IMenuItem button = itemList[i].Data;
-					if (Utilities.IsPointWithin(mouseLocation, button.GetTopLeft(buttonPositions[i]),
-						button.GetLowerRight(buttonPositions[i])))
-						button.IsBeingHovered = true;
+					IMenuItem item = itemList[i].Data;
+					bool pointWithin = Utilities.IsPointWithin(mouseLocation, item.GetTopLeft(buttonPositions[i]),
+						item.GetLowerRight(buttonPositions[i]));
+					item.Hover(pointWithin && !disabled, buttonPositions[i], mouseLocation);
 				}
 			}
 		}
@@ -82,15 +101,15 @@ namespace ProfielWerkstuk.Scripts.Events
 			}
 		}
 
-		public void CheckClickEvent()
+		public void CheckClickEvent(Vector2 clickLocation)
 		{
 			if(OldMouseState.LeftButton == ButtonState.Released &&
 				MouseState.LeftButton == ButtonState.Pressed)
-				LeftClickEvent();
+				LeftClickEvent(clickLocation);
 			if (OldMouseState.LeftButton == ButtonState.Pressed)
 			{
 				if(MouseState.LeftButton == ButtonState.Released)
-					LeftReleaseEvent();
+					LeftReleaseEvent(clickLocation);
 				else if (_validLeftClick)
 				{
 					LeftDragEvent();
@@ -110,13 +129,11 @@ namespace ProfielWerkstuk.Scripts.Events
 			Game.CameraManager.CheckScroll(deltaScroll);
 		}
 
-		public void LeftClickEvent()
+		public void LeftClickEvent(Vector2 clickLocation)
 		{
-			Vector2 clickLocation = new Vector2(MouseState.X, MouseState.Y);
-
 			_validLeftClick = Game.UserInterface.ClickEvent(clickLocation);
 
-			if (_validLeftClick)
+			if (_validLeftClick && AllowDragging)
 			{
 				GridElement element = Game.Grid.GetGridElement(clickLocation);
 				if (element != null && (element.Type == GridElementType.Start || element.Type == GridElementType.End))
@@ -129,20 +146,20 @@ namespace ProfielWerkstuk.Scripts.Events
 			LastLeftClick = clickLocation;
 		}
 
-		public void LeftReleaseEvent()
+		public void LeftReleaseEvent(Vector2 clickLocation)
 		{
-			if(!_validLeftClick)
+			if(!_validLeftClick || !AllowDragging)
 				return;
-
-			Vector2 clickLocation = new Vector2(MouseState.X, MouseState.Y);
 
 			if (DragElement != null)
 			{
 				GridElement element = Game.Grid.GetGridElement(clickLocation);
 				if (element != null && element.Type != GridElementType.End && element.Type != GridElementType.Start)
 				{
-					element.Type = DragElement.Type;
-					DragElement.Type = GridElementType.Empty;
+					if(DragElement.Type == GridElementType.Start)
+						Game.Grid.ChangeStartElement(element);
+					else
+						Game.Grid.ChangeEndElement(element);
 				}
 
 				DragElement = null;
@@ -154,17 +171,7 @@ namespace ProfielWerkstuk.Scripts.Events
 				if(deltaClick.Length() > 2)
 					return;
 
-				GridElement element = Game.Grid.GetGridElement(clickLocation);
-				if (element == null) return;
-				switch (element.Type)
-				{
-					case GridElementType.Empty:
-						element.Type = GridElementType.Solid;
-						break;
-					case GridElementType.Solid:
-						element.Type = GridElementType.Empty;
-						break;
-				}
+				Game.Grid.GridClicked(clickLocation);
 			}
 
 			
@@ -172,7 +179,7 @@ namespace ProfielWerkstuk.Scripts.Events
 
 		public void LeftDragEvent()
 		{
-			if (DragElement == null)
+			if (DragElement == null && AllowDragging)
 				Game.CameraManager.CheckPanning(MouseState, OldMouseState);
 		}
 	}

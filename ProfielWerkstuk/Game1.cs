@@ -4,8 +4,9 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Windows.Forms;
 using ProfielWerkstuk.Scripts.Camera;
 using ProfielWerkstuk.Scripts.Events;
-using ProfielWerkstuk.Scripts.Grid;
+using ProfielWerkstuk.Scripts.GridManagement;
 using ProfielWerkstuk.Scripts.GUI;
+using ProfielWerkstuk.Scripts.Pathfinding;
 using Color = Microsoft.Xna.Framework.Color;
 
 //Mijn profielwerkstuk
@@ -19,6 +20,7 @@ namespace ProfielWerkstuk
 		public GraphicsDeviceManager Graphics;
 		public SpriteBatch SpriteBatch;
 		public Grid Grid;
+		public AlgorithmManager AlgorithmManager;
 		public UserInterfaceManager UserInterface;
 		public CameraManager CameraManager;
 		public InputManager InputManager;
@@ -54,6 +56,7 @@ namespace ProfielWerkstuk
 			IsMouseVisible = true;
 			Grid = new Grid(this, 64, 30, 20, 2);
 			Grid.GenerateGrid();
+			AlgorithmManager = new AlgorithmManager(this);
 
 			// TODO: Add your initialization logic here
 			base.Initialize();
@@ -127,6 +130,7 @@ namespace ProfielWerkstuk
 			SpriteBatch.Begin(transformMatrix: CameraManager.Camera.GetViewMatrix());
 			Grid.DrawGridLines(SpriteBatch);
 			Grid.DrawGridSquares(SpriteBatch);
+			AlgorithmManager.Draw(SpriteBatch);
 			SpriteBatch.End();
 
 			//Draw UI

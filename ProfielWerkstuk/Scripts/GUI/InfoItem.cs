@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ProfielWerkstuk.Scripts.Events;
 
 namespace ProfielWerkstuk.Scripts.GUI
 {
@@ -10,7 +11,7 @@ namespace ProfielWerkstuk.Scripts.GUI
 		private readonly List<InfoTextElement> _infoElements = new List<InfoTextElement>();
 
 		public ClickEvent ClickedEvent { get; set; }
-		public bool IsBeingHovered { get; set; }
+
 		public Vector2 Size { get; set; }
 
 		/// <summary>
@@ -30,6 +31,11 @@ namespace ProfielWerkstuk.Scripts.GUI
 			{
 				element.Draw(spriteBatch, pos + element.Position);
 			}
+		}
+
+		public void Hover(bool hovered, Vector2 position, Vector2 hoverLocation)
+		{
+			
 		}
 
 		public void AddInfoText(InfoTextElement element)
@@ -87,7 +93,8 @@ namespace ProfielWerkstuk.Scripts.GUI
 		public Color TextColor = Color.White;
 		public Vector2 Padding = new Vector2(10f, 10f);
 		public SizeUpdate SizeUpdated;
-		private readonly InfoItem _parent;
+		public ClickEvent ClickedEvent { get; set; }
+		public bool IsBeingHovered;
 
 		private Vector2 _position;
 		public Vector2 Position
@@ -111,25 +118,23 @@ namespace ProfielWerkstuk.Scripts.GUI
 			}
 		}
 
-		public InfoTextElement(InfoItem parent, Vector2 pos, Vector2 size, string text, SpriteFont font)
+		public InfoTextElement(Vector2 pos, Vector2 size, string text, SpriteFont font)
 		{
 			_position = pos;
 			Text = text;
 			Font = font;
 			_size = size;
-			_parent = parent;
 			UpdateSize();
 		}
 
 		public void Draw(SpriteBatch spriteBatch, Vector2 pos)
 		{
-			Color textColor = _parent.IsBeingHovered ? Color.Orange : TextColor;
 			Vector2 textVector2 = pos - Font.MeasureString(Text) / 2;
 			//This prevents some nasty anti-aliasing making the letters clearer and less smudged
 			textVector2.X = (int)textVector2.X;
 			textVector2.Y = (int)textVector2.Y;
 
-			spriteBatch.DrawString(Font, Text, textVector2, textColor);
+			spriteBatch.DrawString(Font, Text, textVector2, TextColor);
 		}
 
 		public Vector2 GetMinimalSize()
@@ -143,6 +148,4 @@ namespace ProfielWerkstuk.Scripts.GUI
 			Size = new Vector2(Math.Max(minSize.X, Size.X), Math.Max(minSize.Y, Size.Y));
 		}
 	}
-
-	public delegate void SizeUpdate(InfoTextElement element);
 }

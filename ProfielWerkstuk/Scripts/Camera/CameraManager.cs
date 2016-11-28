@@ -20,6 +20,7 @@ namespace ProfielWerkstuk.Scripts.Camera
 				MaximumZoom = 3f
 			};
 			
+			Camera.Position = new Vector2(-game.Graphics.PreferredBackBufferWidth/2f, -game.Graphics.PreferredBackBufferHeight/2f);
 			MainGame = game;
 		}
 
