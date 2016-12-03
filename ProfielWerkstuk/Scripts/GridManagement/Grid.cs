@@ -12,10 +12,11 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 		public int HalfHeight;
 		public float LineWidth;
 		public RectangleF GridBounds;
-		public GridElement[,] GridElements;
+		private readonly GridElement[,] _gridElements;
 		public GridElementType GridHoldType = GridElementType.Null;
-		public GridElement StartElement;
-		public GridElement EndElement;
+		private GridElement _startElement;
+		private GridElement _endElement;
+		public bool AlgorithmActive;
 
 		public Grid(Game1 game, int gridSize, int halfWidth, int halfHeight, int lineWidth)
 		{
@@ -25,13 +26,13 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 			HalfHeight = halfHeight;
 			LineWidth = lineWidth;
 
-			GridElements = new GridElement[2 * halfHeight, 2 * halfWidth];
+			_gridElements = new GridElement[2 * halfHeight, 2 * halfWidth];
 
-			for (int index = 0; index < GridElements.Length; index++)
+			for (int index = 0; index < _gridElements.Length; index++)
 			{
 				int x = index%(2*halfWidth);
 				int y = index/(2*halfWidth);
-				GridElements[y, x] = new GridElement(x, y);
+				_gridElements[y, x] = new GridElement(x, y);
 			}
 
 			float stepRate = GetStepRate();
@@ -41,33 +42,39 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 
 		public void GenerateGrid()
 		{
-			StartElement = GridElements[HalfHeight, HalfWidth / 2];
-			EndElement = GridElements[HalfHeight, HalfWidth + HalfWidth / 2];
-			StartElement.Type = GridElementType.Start;
-			EndElement.Type = GridElementType.End;
+			_startElement = _gridElements[HalfHeight, HalfWidth / 2];
+			_endElement = _gridElements[HalfHeight, HalfWidth + HalfWidth / 2];
+			_startElement.Type = GridElementType.Start;
+			_endElement.Type = GridElementType.End;
 		}
 
 		public void ChangeStartElement(GridElement newElement)
 		{
-			StartElement.Type = GridElementType.Empty;
+			if (AlgorithmActive)
+				return;
+
+			_startElement.Type = GridElementType.Empty;
 			newElement.Type = GridElementType.Start;
-			StartElement = newElement;
+			_startElement = newElement;
 		}
 
 		public void ChangeEndElement(GridElement newElement)
 		{
-			EndElement.Type = GridElementType.Empty;
+			if(AlgorithmActive)
+				return;
+
+			_endElement.Type = GridElementType.Empty;
 			newElement.Type = GridElementType.End;
-			EndElement = newElement;
+			_endElement = newElement;
 		}
 
 		public void DrawGridSquares(SpriteBatch spriteBatch)
 		{
-			for (int index = 0; index < GridElements.Length; index++)
+			for (int index = 0; index < _gridElements.Length; index++)
 			{
 				int x = index % (2 * HalfWidth);
 				int y = index / (2 * HalfWidth);
-				GridElement element = GridElements[y, x];
+				GridElement element = _gridElements[y, x];
 
 				switch (element.Type)
 				{
@@ -88,7 +95,10 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 						break;
 				}
 			}
+		}
 
+		public void DrawDragElement(SpriteBatch spriteBatch)
+		{
 			Vector2 mouseLocation = new Vector2(Game.InputManager.MouseState.X, Game.InputManager.MouseState.Y);
 			GridElement targetElement = GetGridElement(mouseLocation);
 			GridElement dragElement = Game.InputManager.DragElement;
@@ -150,13 +160,16 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 			int xIndex = (int)(correctedPos.X / stepRate);
 			int yIndex = (int)(correctedPos.Y / stepRate);
 			if (xIndex >= 0 && xIndex < HalfWidth*2 && yIndex >= 0 && yIndex < HalfHeight*2)
-				return GridElements[yIndex, xIndex];
+				return _gridElements[yIndex, xIndex];
 
 			return null;
 		}
 
 		public void GridClicked(Vector2 clickLocation)
 		{
+			if (AlgorithmActive)
+				return;
+
 			GridElement element = GetGridElement(clickLocation);
 			if (element == null)
 				return;
@@ -173,6 +186,9 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 
 		public void GridHoldClick(Vector2 mouseLocation)
 		{
+			if (AlgorithmActive)
+				return;
+
 			GridElement element = GetGridElement(mouseLocation);
 			if(element == null)
 				return;
@@ -183,6 +199,16 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 			}
 
 			element.Type = GridHoldType;
+		}
+
+		public GridElement[,] GetGridMap()
+		{
+			return AlgorithmActive ? null : _gridElements;
+		}
+
+		public GridElement GetStartElement()
+		{
+			return AlgorithmActive ? null : _startElement;
 		}
 	}
 }

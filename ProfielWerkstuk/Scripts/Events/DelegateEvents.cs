@@ -8,4 +8,6 @@ namespace ProfielWerkstuk.Scripts.Events
 	public delegate void SizeUpdate(InfoTextElement element);
 
 	public delegate void ClickEvent(IMenuItem item, Vector2 clickLocation);
+
+	public delegate void CalculatingEvent(bool isCalculating);
 }

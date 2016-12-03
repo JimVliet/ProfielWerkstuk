@@ -5,5 +5,6 @@
 		AlgorithmType Type { get; set; }
 		void CalculatePath();
 		void Callback(AlgorithmManager manager);
+		string GetName();
 	}
 }

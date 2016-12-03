@@ -6,8 +6,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.AlgorithmDisplayers
 {
 	public interface IDisplayer
 	{
-		List<Vector2> PathDrawingPoints { get; set; }
-
-		void Draw(SpriteBatch spriteBatch);
+		void UpdateDisplayer(List<Vector2> pathDrawingPoints, List<ResultInfo> resultInfo);
+		void Draw(SpriteBatch spriteBatch, GameTime gameTime);
 	}
 }

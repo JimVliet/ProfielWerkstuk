@@ -15,5 +15,15 @@ namespace ProfielWerkstuk.Scripts.Utility
 			//Check if the area of the triangle is equal to 0
 			return xOne * (yTwo - yThree) + xTwo * (yThree - yOne) + xThree * (yOne - yTwo) == 0;
 		}
+
+		public static int GetWindowWidth(Game1 game)
+		{
+			return game.Graphics.PreferredBackBufferWidth;
+		}
+
+		public static int GetWindowHeight(Game1 game)
+		{
+			return game.Graphics.PreferredBackBufferHeight;
+		}
 	}
 }

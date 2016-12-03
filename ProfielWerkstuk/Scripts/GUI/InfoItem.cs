@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ProfielWerkstuk.Scripts.Events;
+using ProfielWerkstuk.Scripts.Utility;
 
 namespace ProfielWerkstuk.Scripts.GUI
 {
@@ -35,7 +36,12 @@ namespace ProfielWerkstuk.Scripts.GUI
 
 		public void Hover(bool hovered, Vector2 position, Vector2 hoverLocation)
 		{
-			
+			foreach (InfoTextElement element in _infoElements)
+			{
+				bool elementHover = hovered && Utilities.IsPointWithin(hoverLocation, element.GetTopLeft(position),
+					element.GetLowerRight(position));
+				element.Hover(elementHover, position, hoverLocation);
+			}
 		}
 
 		public void AddInfoText(InfoTextElement element)
@@ -91,10 +97,21 @@ namespace ProfielWerkstuk.Scripts.GUI
 		public SpriteFont Font;
 		public string Text;
 		public Color TextColor = Color.White;
-		public Vector2 Padding = new Vector2(10f, 10f);
-		public SizeUpdate SizeUpdated;
+		public Vector2 PreferedSize;
+
+		private Vector2 _padding;
+		public Vector2 Padding
+		{
+			get { return _padding; }
+			set
+			{
+				_padding = value;
+				UpdateSize();
+			}
+		}
 		public ClickEvent ClickedEvent { get; set; }
-		public bool IsBeingHovered;
+		private bool _isBeingHovered;
+		public bool ActOnHover;
 
 		private Vector2 _position;
 		public Vector2 Position
@@ -102,8 +119,8 @@ namespace ProfielWerkstuk.Scripts.GUI
 			get { return _position; }
 			set
 			{
-				SizeUpdated?.Invoke(this);
 				_position = value;
+				UpdateSize();
 			}
 		}
 
@@ -113,39 +130,57 @@ namespace ProfielWerkstuk.Scripts.GUI
 			get { return _size; }
 			set
 			{
-				SizeUpdated?.Invoke(this);
+				UpdateSize();
 				_size = value;
 			}
 		}
 
-		public InfoTextElement(Vector2 pos, Vector2 size, string text, SpriteFont font)
+		public InfoTextElement(Vector2 pos, Vector2 preferedSize, string text, SpriteFont font)
 		{
+			_padding = new Vector2(10f, 10f);
 			_position = pos;
 			Text = text;
 			Font = font;
-			_size = size;
+			PreferedSize = preferedSize;
 			UpdateSize();
 		}
 
 		public void Draw(SpriteBatch spriteBatch, Vector2 pos)
 		{
+			Color text = ActOnHover && _isBeingHovered ? Color.Orange : TextColor;
+
 			Vector2 textVector2 = pos - Font.MeasureString(Text) / 2;
 			//This prevents some nasty anti-aliasing making the letters clearer and less smudged
 			textVector2.X = (int)textVector2.X;
 			textVector2.Y = (int)textVector2.Y;
 
-			spriteBatch.DrawString(Font, Text, textVector2, TextColor);
+			spriteBatch.DrawString(Font, Text, textVector2, text);
 		}
 
 		public Vector2 GetMinimalSize()
 		{
-			return Font.MeasureString(Text) + (2 * Padding);
+			return Font.MeasureString(Text) + 2 * Padding;
 		}
 
 		public void UpdateSize()
 		{
 			Vector2 minSize = GetMinimalSize();
-			Size = new Vector2(Math.Max(minSize.X, Size.X), Math.Max(minSize.Y, Size.Y));
+			_size = new Vector2(Math.Max(minSize.X, PreferedSize.X), Math.Max(minSize.Y, PreferedSize.Y));
+		}
+
+		public Vector2 GetTopLeft(Vector2 pos)
+		{
+			return pos + Position - (Size / 2);
+		}
+
+		public Vector2 GetLowerRight(Vector2 pos)
+		{
+			return pos + Position + (Size / 2);
+		}
+
+		public void Hover(bool hovered, Vector2 position, Vector2 hoverLocation)
+		{
+			_isBeingHovered = hovered;
 		}
 	}
 }

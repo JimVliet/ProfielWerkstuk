@@ -15,9 +15,6 @@ namespace ProfielWerkstuk.Scripts.GUI
 		private readonly List<MenuItem> _menuItemList = new List<MenuItem>();
 		public Vector2 Margin = new Vector2(25f, 25f);
 		public float BaseButtonDistance = 25f;
-		public bool IsActive = true;
-		public bool IsBeingDisabled;
-		public bool AllowClicking = true;
 		public MenuActivated MenuActivated;
 
 		public Menu(Vector2 pos)

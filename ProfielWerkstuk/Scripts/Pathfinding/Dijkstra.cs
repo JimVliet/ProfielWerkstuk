@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Xna.Framework;
 using ProfielWerkstuk.Scripts.GridManagement;
 
 namespace ProfielWerkstuk.Scripts.Pathfinding
@@ -8,7 +9,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 	{
 		public GridElement[,] GridElements;
 		public List<GridElement> ResultPath;
-		public List<DijkstraResultInfo> ResultInfo;
+		public List<ResultInfo> ResultInfo = new List<ResultInfo>();
 		public GridElement StartElement;
 		public bool AllowDiagonal;
 		public AlgorithmType Type { get; set; }
@@ -55,6 +56,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 					break;
 				}
 
+				ResultInfo.Add(new ResultInfo(distances[smallest], smallest.X, smallest.Y, ResultInfoType.Visited));
 				List<GridElement> neighbours = smallest.GetNeighbourElements(GridElements, AllowDiagonal);
 				foreach (GridElement neighbour in neighbours)
 				{ 
@@ -64,6 +66,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 						distances[neighbour] = distanceTotal;
 						previous[neighbour] = smallest;
 						nodes.Add(neighbour);
+						ResultInfo.Add(new ResultInfo(distanceTotal, neighbour.X, neighbour.Y, ResultInfoType.Frontier));
 					}
 				}
 			}
@@ -71,21 +74,12 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 
 		public void Callback(AlgorithmManager manager)
 		{
-			manager.Displayer.PathDrawingPoints = manager.GetPathDrawingPoints(ResultPath);
+			manager.Displayer.UpdateDisplayer(manager.GetPathDrawingPoints(ResultPath), ResultInfo);
 		}
-	}
 
-	public class DijkstraResultInfo
-	{
-		public int Distance;
-		public int X;
-		public int Y;
-
-		public DijkstraResultInfo(int distance, int x, int y)
+		public string GetName()
 		{
-			Distance = distance;
-			X = x;
-			Y = y;
+			return "Dijkstra";
 		}
 	}
 }

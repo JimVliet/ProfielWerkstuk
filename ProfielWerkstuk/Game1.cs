@@ -24,6 +24,7 @@ namespace ProfielWerkstuk
 		public UserInterfaceManager UserInterface;
 		public CameraManager CameraManager;
 		public InputManager InputManager;
+		public CustomEvents CustomEvents;
 
 		public Game1()
 		{
@@ -34,9 +35,7 @@ namespace ProfielWerkstuk
 
 		private void graphics_PreparingDeviceSettings(object sender, PreparingDeviceSettingsEventArgs e)
 		{
-			//Form form = (Form)Control.FromHandle(Window.Handle);
-
-			//Setup antialiasing and 
+			//Setup antialiasing and monitor device
 			Graphics.PreferMultiSampling = true;
 			Graphics.GraphicsProfile = GraphicsProfile.HiDef;
 			Graphics.SynchronizeWithVerticalRetrace = true;
@@ -53,8 +52,10 @@ namespace ProfielWerkstuk
 		/// </summary>
 		protected override void Initialize()
 		{
+			CustomEvents = new CustomEvents();
+
 			IsMouseVisible = true;
-			Grid = new Grid(this, 64, 30, 20, 2);
+			Grid = new Grid(this, 64, 60, 40, 2);
 			Grid.GenerateGrid();
 			AlgorithmManager = new AlgorithmManager(this);
 
@@ -130,12 +131,13 @@ namespace ProfielWerkstuk
 			SpriteBatch.Begin(transformMatrix: CameraManager.Camera.GetViewMatrix());
 			Grid.DrawGridLines(SpriteBatch);
 			Grid.DrawGridSquares(SpriteBatch);
-			AlgorithmManager.Draw(SpriteBatch);
+			AlgorithmManager.Draw(SpriteBatch, gameTime);
+			Grid.DrawDragElement(SpriteBatch);
 			SpriteBatch.End();
 
 			//Draw UI
 			SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
-			UserInterface.Draw(SpriteBatch);
+			UserInterface.Draw(SpriteBatch, gameTime);
 			SpriteBatch.End();
 
 			base.Draw(gameTime);
