@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Shapes;
@@ -12,8 +11,8 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.AlgorithmDisplayers
 		private List<Vector2> _pathDrawingPoints;
 		public Grid Grid;
 		private List<ResultInfo> _resultInfo;
-		private double _infoCounter;
-		public int InfoAddSpeed = 150;
+		private double _distanceCounter;
+		public int InfoAddSpeed = 10;
 
 		public DijkstraDisplayer(Grid grid)
 		{
@@ -27,13 +26,15 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.AlgorithmDisplayers
 			if (_pathDrawingPoints == null || _pathDrawingPoints.Count <= 1 || _resultInfo == null)
 				return;
 
-			_infoCounter += gameTime.ElapsedGameTime.Milliseconds/1000d * InfoAddSpeed + Math.Sqrt(0.5 * _infoCounter);
-			bool maxReached = _infoCounter > _resultInfo.Count;
-			_infoCounter = maxReached ? _resultInfo.Count : _infoCounter;
+			_distanceCounter += gameTime.ElapsedGameTime.Milliseconds/1000d * InfoAddSpeed;
+			bool maxReached = _distanceCounter > _resultInfo[_resultInfo.Count-1].Distance;
+			_distanceCounter = maxReached ? _resultInfo[_resultInfo.Count - 1].Distance : _distanceCounter;
 
-			for (int i = 0; i < (int)_infoCounter; i++)
+			foreach (ResultInfo info in _resultInfo)
 			{
-				ResultInfo info = _resultInfo[i];
+				if(info.Distance - info.GetExtraDistance() > _distanceCounter)
+					continue;
+
 				if (Grid.GetGridMap()?[info.Y, info.X].Type == GridElementType.Empty)
 					spriteBatch.FillRectangle(Grid.GetGridVector2(info.X, info.Y), new Vector2(Grid.GridSize, Grid.GridSize), info.GetColor());
 			}
@@ -54,7 +55,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.AlgorithmDisplayers
 		{
 			_pathDrawingPoints = pathDrawingPoints;
 			_resultInfo = resultInfo;
-			_infoCounter = 0;
+			_distanceCounter = 0;
 		}
 	}
 }

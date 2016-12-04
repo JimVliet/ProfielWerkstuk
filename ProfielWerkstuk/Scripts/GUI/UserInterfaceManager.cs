@@ -47,11 +47,11 @@ namespace ProfielWerkstuk.Scripts.GUI
 				for (int i = 0; i < itemList.Count; i++)
 				{
 					IMenuItem item = itemList[i].Data;
-					if (Utilities.IsPointWithin(clickLocation, item.GetTopLeft(buttonPositions[i]), item.GetLowerRight(buttonPositions[i])))
-					{
-						item.ClickedEvent?.Invoke(item, clickLocation);
-						return false;
-					}
+					if (!Utilities.IsPointWithin(clickLocation, item.GetTopLeft(buttonPositions[i]), item.GetLowerRight(buttonPositions[i])))
+						continue;
+
+					item.ClickedEvent?.Invoke(item, clickLocation);
+					return false;
 				}
 			}
 

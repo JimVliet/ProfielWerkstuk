@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using ProfielWerkstuk.Scripts.Utility;
 
 namespace ProfielWerkstuk.Scripts.GUI.States
@@ -15,6 +16,13 @@ namespace ProfielWerkstuk.Scripts.GUI.States
 			SetupOptionMenu();
 			SetupEscapeButtonMenu();
 			SetupControlMenu();
+		}
+
+		public new void Draw(SpriteBatch spriteBatch, GameTime gameTime)
+		{
+			base.Draw(spriteBatch, gameTime);
+
+
 		}
 
 		private void SetupOptionMenu()

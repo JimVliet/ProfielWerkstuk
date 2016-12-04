@@ -28,6 +28,17 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 			}
 			return Color.Black;
 		}
+
+		public double GetExtraDistance()
+		{
+			switch (Type)
+			{
+				case ResultInfoType.Frontier:
+					return 1d;
+				default:
+					return 0d;
+			}
+		}
 	}
 
 	public enum ResultInfoType
