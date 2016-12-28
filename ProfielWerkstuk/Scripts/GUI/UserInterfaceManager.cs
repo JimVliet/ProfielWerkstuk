@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ProfielWerkstuk.Scripts.GUI.BaseClasses;
 using ProfielWerkstuk.Scripts.GUI.States;
-using ProfielWerkstuk.Scripts.Utility;
 
 namespace ProfielWerkstuk.Scripts.GUI
 {
@@ -12,17 +11,25 @@ namespace ProfielWerkstuk.Scripts.GUI
 		public SpriteFont Font28;
 		public SpriteFont Font24;
 		public SpriteFont Font16;
-		public Game1 Game;
+		public readonly ProfielWerkstuk Game;
 		private BaseUserInterfaceState _uiState;
 		private readonly GridMapState _gridMapState;
 		private readonly MainMenuState _mainMenuState;
+		private BaseMenuElement _hoverElement;
 
-		public UserInterfaceManager(Game1 game)
+		public UserInterfaceManager(ProfielWerkstuk game)
 		{
 			Game = game;
-			_gridMapState = new GridMapState(game);
-			_mainMenuState = new MainMenuState(game);
+			_gridMapState = new GridMapState(game, this);
+			_mainMenuState = new MainMenuState(game, this);
 			SwitchToState(UserInterfaceStates.GridMap);
+
+			Game.EventHandlers.OpenMainMenu += EscapeButtonClick;
+		}
+
+		private void EscapeButtonClick()
+		{
+			SwitchToState(UserInterfaceStates.MainMenu);
 		}
 
 		public void Setup()
@@ -31,56 +38,52 @@ namespace ProfielWerkstuk.Scripts.GUI
 			_gridMapState.Setup();
 		}
 
-		/// <summary>
-		/// This method needs to be used when the user has clicked somewhere
-		/// </summary>
-		/// <returns>Returns true if the click location is outside any menus</returns>
-		public bool ClickEvent(Vector2 clickLocation)
+		public void Update(GameTime gameTime)
 		{
-			foreach (Menu menu in _uiState.MenuList)
-			{
-				if (!Utilities.IsPointWithin(clickLocation, menu.GetTopLeft(), menu.GetLowerRight()))
-					continue;
-				
-				List<MenuItem> itemList = menu.GetMenuItems();
-				List<Vector2> buttonPositions = menu.GetButtonPositions();
-				for (int i = 0; i < itemList.Count; i++)
-				{
-					IMenuItem item = itemList[i].Data;
-					if (!Utilities.IsPointWithin(clickLocation, item.GetTopLeft(buttonPositions[i]), item.GetLowerRight(buttonPositions[i])))
-						continue;
-
-					item.ClickedEvent?.Invoke(item, clickLocation);
-					return false;
-				}
-			}
-
-			return AllowClicking();
+			_uiState?.Update(gameTime);
 		}
 
-		public bool OutsideMenus(Vector2 clickLocation)
+		public UserInterfaceMenu GetMenu(Vector2 mouseLocation)
 		{
-			return !_uiState.MenuList.All(menu => Utilities.IsPointWithin(clickLocation, menu.GetTopLeft(), menu.GetLowerRight()));
+			return _uiState.UserInterfaceMenuList.FirstOrDefault(menu => menu.IsPointWithin(mouseLocation));
 		}
 
 		public void CheckMouseHover(Vector2 mouseLocation)
 		{
-			List<Menu> menuList = _uiState.MenuList;
-
-			foreach (Menu menu in menuList)
+			foreach (var menu in _uiState.UserInterfaceMenuList)
 			{
-				bool enabled = Utilities.IsPointWithin(mouseLocation, menu.GetTopLeft(), menu.GetLowerRight());
+				if (!menu.IsPointWithin(mouseLocation))
+					continue;
 
-				List<MenuItem> itemList = menu.GetMenuItems();
-				List<Vector2> buttonPositions = menu.GetButtonPositions();
-				for (int i = 0; i < itemList.Count; i++)
-				{
-					IMenuItem item = itemList[i].Data;
-					bool pointWithin = Utilities.IsPointWithin(mouseLocation, item.GetTopLeft(buttonPositions[i]),
-						item.GetLowerRight(buttonPositions[i]));
-					item.Hover(pointWithin && enabled, buttonPositions[i], mouseLocation);
-				}
+				BaseMenuElement element = menu.CheckHover(mouseLocation);
+
+				if (element == null || element.Equals(_hoverElement))
+					return;
+
+				_hoverElement?.UnHover();
+				_hoverElement = element;
+				element.Hover();
+				return;
 			}
+
+			_hoverElement?.UnHover();
+			_hoverElement = null;
+		}
+
+		public void LeftReleaseEvent(Vector2 mouseLocation)
+		{
+			UserInterfaceMenu menu = GetMenu(mouseLocation);
+			menu?.LeftReleaseEvent(mouseLocation);
+		}
+
+		public bool ClickEvent(Vector2 mouseLocation)
+		{
+			UserInterfaceMenu menu = GetMenu(mouseLocation);
+			if (menu == null)
+				return true;
+
+			menu.CheckLeftClick(mouseLocation);
+			return false;
 		}
 
 		public void Draw(SpriteBatch spriteBatch, GameTime gameTime)

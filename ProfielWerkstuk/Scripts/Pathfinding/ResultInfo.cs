@@ -1,25 +1,28 @@
 ﻿using Microsoft.Xna.Framework;
+using ProfielWerkstuk.Scripts.GridManagement;
 
 namespace ProfielWerkstuk.Scripts.Pathfinding
 {
 	public class ResultInfo
 	{
-		public ResultInfoType Type;
-		public double Distance;
-		public int X;
-		public int Y;
+		private readonly ResultInfoType _type;
+		public readonly double Distance;
+		public readonly int X;
+		public readonly int Y;
+		public readonly GridElement PreviousElement;
 
-		public ResultInfo(double distance, int x, int y, ResultInfoType type)
+		public ResultInfo(GridElement element, double distance, ResultInfoType type, GridElement previous)
 		{
+			_type = type;
 			Distance = distance;
-			X = x;
-			Y = y;
-			Type = type;
+			X = element.X;
+			Y = element.Y;
+			PreviousElement = previous;
 		}
 
 		public Color GetColor()
 		{
-			switch (Type)
+			switch (_type)
 			{
 				case ResultInfoType.Frontier:
 					return Color.LightGreen;
@@ -31,7 +34,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 
 		public double GetExtraDistance()
 		{
-			switch (Type)
+			switch (_type)
 			{
 				case ResultInfoType.Frontier:
 					return 1d;
@@ -43,6 +46,6 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 
 	public enum ResultInfoType
 	{
-		Visited, Frontier
+		Visited, Frontier, Cleared
 	}
 }

@@ -16,12 +16,12 @@ namespace ProfielWerkstuk.Scripts.Utility
 			return xOne * (yTwo - yThree) + xTwo * (yThree - yOne) + xThree * (yOne - yTwo) == 0;
 		}
 
-		public static int GetWindowWidth(Game1 game)
+		public static int GetWindowWidth(ProfielWerkstuk game)
 		{
 			return game.Graphics.PreferredBackBufferWidth;
 		}
 
-		public static int GetWindowHeight(Game1 game)
+		public static int GetWindowHeight(ProfielWerkstuk game)
 		{
 			return game.Graphics.PreferredBackBufferHeight;
 		}

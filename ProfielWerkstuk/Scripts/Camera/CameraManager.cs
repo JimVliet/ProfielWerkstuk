@@ -9,18 +9,18 @@ namespace ProfielWerkstuk.Scripts.Camera
 	public class CameraManager
 	{
 		public Camera2D Camera;
-		public Game1 MainGame;
+		public ProfielWerkstuk MainGame;
 
-		public CameraManager(GraphicsDevice graphicsDevice, Game1 game)
+		public CameraManager(GraphicsDevice graphicsDevice, ProfielWerkstuk game)
 		{
 			//Create camera
 			Camera = new Camera2D(graphicsDevice)
 			{
 				MinimumZoom = 0.3f,
-				MaximumZoom = 3f
+				MaximumZoom = 3f,
+				Position = new Vector2(-game.Graphics.PreferredBackBufferWidth/2f, -game.Graphics.PreferredBackBufferHeight/2f)
 			};
-			
-			Camera.Position = new Vector2(-game.Graphics.PreferredBackBufferWidth/2f, -game.Graphics.PreferredBackBufferHeight/2f);
+
 			MainGame = game;
 		}
 

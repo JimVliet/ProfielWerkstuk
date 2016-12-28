@@ -8,5 +8,8 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.AlgorithmDisplayers
 	{
 		void UpdateDisplayer(List<Vector2> pathDrawingPoints, List<ResultInfo> resultInfo);
 		void Draw(SpriteBatch spriteBatch, GameTime gameTime);
+		void CleanUp();
+		void Update(GameTime gameTime);
+		int GetExplored();
 	}
 }

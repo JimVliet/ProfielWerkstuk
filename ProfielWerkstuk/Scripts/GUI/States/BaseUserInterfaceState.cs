@@ -1,46 +1,57 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ProfielWerkstuk.Scripts.GUI.BaseClasses;
 
 namespace ProfielWerkstuk.Scripts.GUI.States
 {
 	public class BaseUserInterfaceState
 	{
-		public List<Menu> MenuList = new List<Menu>();
-		public Game1 Game;
-		public UserInterfaceStates StateType;
+		public readonly List<UserInterfaceMenu> UserInterfaceMenuList = new List<UserInterfaceMenu>();
+		public readonly ProfielWerkstuk Game;
+		public readonly UserInterfaceManager UiManager;
+		public readonly UserInterfaceStates StateType;
 		public bool AllowClicking = true;
 
-		internal BaseUserInterfaceState(Game1 game, UserInterfaceStates type)
+		internal BaseUserInterfaceState(ProfielWerkstuk game, UserInterfaceManager uiManager, UserInterfaceStates type)
 		{
 			Game = game;
+			UiManager = uiManager;
 			StateType = type;
 		}
 
-		public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
+		public virtual void Draw(SpriteBatch spriteBatch, GameTime gameTime)
 		{
-			foreach (Menu menu in MenuList)
+			DrawMenus(spriteBatch, gameTime);
+		}
+
+		protected void DrawMenus(SpriteBatch spriteBatch, GameTime gameTime)
+		{
+			foreach (var menu in UserInterfaceMenuList)
 			{
 				menu.Draw(spriteBatch);
 			}
 		}
 
-		public void Update(GameTime gameTime)
+		public virtual void Update(GameTime gameTime)
 		{
 			
 		}
 
-		public void Setup()
+		public virtual void Setup()
 		{
 			
 		}
 
-		public Menu CreateMenu(Vector2 position)
+		public void AddUserInterfaceMenu(UserInterfaceMenu uiMenu)
 		{
-			Menu newMenu = new Menu(position);
-			MenuList.Add(newMenu);
-			return newMenu;
+			UserInterfaceMenuList.Add(uiMenu);
 		}
+
+		public EventHandlers GetEventHandlers()
+		{
+			return UiManager.Game.EventHandlers;
+		} 
 	}
 
 	public enum UserInterfaceStates

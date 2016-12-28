@@ -6,6 +6,7 @@ using ProfielWerkstuk.Scripts.Camera;
 using ProfielWerkstuk.Scripts.Events;
 using ProfielWerkstuk.Scripts.GridManagement;
 using ProfielWerkstuk.Scripts.GUI;
+using ProfielWerkstuk.Scripts.GUI.Textures;
 using ProfielWerkstuk.Scripts.Pathfinding;
 using Color = Microsoft.Xna.Framework.Color;
 
@@ -15,22 +16,25 @@ namespace ProfielWerkstuk
 	/// <summary>
 	/// This is the main type for your game.
 	/// </summary>
-	public class Game1 : Game
+	public class ProfielWerkstuk : Game
 	{
-		public GraphicsDeviceManager Graphics;
-		public SpriteBatch SpriteBatch;
+		public readonly GraphicsDeviceManager Graphics;
+		public readonly EventHandlers EventHandlers;
+		public readonly TextureManager TextureManager = new TextureManager();
 		public Grid Grid;
 		public AlgorithmManager AlgorithmManager;
 		public UserInterfaceManager UserInterface;
 		public CameraManager CameraManager;
 		public InputManager InputManager;
-		public CustomEvents CustomEvents;
 
-		public Game1()
+		private SpriteBatch _spriteBatch;
+
+		public ProfielWerkstuk()
 		{
 			Graphics = new GraphicsDeviceManager(this);
 			Content.RootDirectory = "Content";
 			Graphics.PreparingDeviceSettings += graphics_PreparingDeviceSettings;
+			EventHandlers = new EventHandlers();
 		}
 
 		private void graphics_PreparingDeviceSettings(object sender, PreparingDeviceSettingsEventArgs e)
@@ -40,7 +44,7 @@ namespace ProfielWerkstuk
 			Graphics.GraphicsProfile = GraphicsProfile.HiDef;
 			Graphics.SynchronizeWithVerticalRetrace = true;
 			Graphics.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
-			e.GraphicsDeviceInformation.PresentationParameters.MultiSampleCount = 16;
+			e.GraphicsDeviceInformation.PresentationParameters.MultiSampleCount = 8;
 			Window.AllowUserResizing = true;
 		}
 
@@ -52,15 +56,14 @@ namespace ProfielWerkstuk
 		/// </summary>
 		protected override void Initialize()
 		{
-			CustomEvents = new CustomEvents();
-
 			IsMouseVisible = true;
-			Grid = new Grid(this, 64, 60, 40, 2);
+			Grid = new Grid(this, 64, 30, 20, 2);
 			Grid.GenerateGrid();
-			AlgorithmManager = new AlgorithmManager(this);
 
-			// TODO: Add your initialization logic here
 			base.Initialize();
+
+			AlgorithmManager = new AlgorithmManager(this);
+			InputManager = new InputManager(this);
 
 			Form form = (Form)Control.FromHandle(Window.Handle);
 			form.WindowState = FormWindowState.Maximized;
@@ -80,15 +83,21 @@ namespace ProfielWerkstuk
 		/// </summary>
 		protected override void LoadContent()
 		{
-			InputManager = new InputManager(this);
 			UserInterface = new UserInterfaceManager(this);
 
 			// Create a new SpriteBatch, which can be used to draw textures.
-			SpriteBatch = new SpriteBatch(GraphicsDevice);
+			_spriteBatch = new SpriteBatch(GraphicsDevice);
 			UserInterface.Font28 = Content.Load<SpriteFont>("Raleway28");
 			UserInterface.Font24 = Content.Load<SpriteFont>("Raleway24");
 			UserInterface.Font16 = Content.Load<SpriteFont>("Raleway16");
-			// TODO: use this.Content to load your game content here
+
+			//Load controlMenu textures
+			TextureManager.Play = Content.Load<Texture2D>("Play");
+			TextureManager.Pause = Content.Load<Texture2D>("Pause");
+			TextureManager.FastForward = Content.Load<Texture2D>("FastForward");
+			TextureManager.FastBackward = Content.Load<Texture2D>("FastBackward");
+			TextureManager.SkipEnd = Content.Load<Texture2D>("SkipEnd");
+			TextureManager.SkipStart = Content.Load<Texture2D>("SkipStart");
 		}
 
 		/// <summary>
@@ -97,9 +106,9 @@ namespace ProfielWerkstuk
 		/// </summary>
 		protected override void UnloadContent()
 		{
-			// TODO: Unload any non ContentManager content here
-			SpriteBatch.Dispose();
+			_spriteBatch.Dispose();
 			Graphics.Dispose();
+			TextureManager.Dispose();
 		}
 
 		/// <summary>
@@ -109,11 +118,13 @@ namespace ProfielWerkstuk
 		/// <param name="gameTime">Provides a snapshot of timing values.</param>
 		protected override void Update(GameTime gameTime)
 		{
-			// TODO: Add your update logic here
 
 			if(Form.ActiveForm == (Control.FromHandle(Window.Handle) as Form))
 			{
 				InputManager.Update();
+				UserInterface.Update(gameTime);
+				AlgorithmManager.Update(gameTime);
+				Grid.Update(gameTime);
 			}
 			
 			base.Update(gameTime);
@@ -128,17 +139,16 @@ namespace ProfielWerkstuk
 			GraphicsDevice.Clear(Color.WhiteSmoke);
 			// TODO: Add your drawing code 
 
-			SpriteBatch.Begin(transformMatrix: CameraManager.Camera.GetViewMatrix());
-			Grid.DrawGridLines(SpriteBatch);
-			Grid.DrawGridSquares(SpriteBatch);
-			AlgorithmManager.Draw(SpriteBatch, gameTime);
-			Grid.DrawDragElement(SpriteBatch);
-			SpriteBatch.End();
+			_spriteBatch.Begin(transformMatrix: CameraManager.Camera.GetViewMatrix());
+			Grid.DrawGridLines(_spriteBatch);
+			Grid.DrawGridSquares(_spriteBatch);
+			AlgorithmManager.Draw(_spriteBatch, gameTime);
+			_spriteBatch.End();
 
 			//Draw UI
-			SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
-			UserInterface.Draw(SpriteBatch, gameTime);
-			SpriteBatch.End();
+			_spriteBatch.Begin(samplerState: SamplerState.PointClamp, blendState: BlendState.AlphaBlend);
+			UserInterface.Draw(_spriteBatch, gameTime);
+			_spriteBatch.End();
 
 			base.Draw(gameTime);
 		}

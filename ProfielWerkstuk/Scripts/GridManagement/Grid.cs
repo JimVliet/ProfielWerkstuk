@@ -6,7 +6,7 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 {
 	public class Grid
 	{
-		public Game1 Game;
+		private ProfielWerkstuk _game;
 		public int GridSize;
 		public int HalfWidth;
 		public int HalfHeight;
@@ -17,10 +17,11 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 		private GridElement _startElement;
 		private GridElement _endElement;
 		public bool AlgorithmActive;
+		private DraggingInfo _draggingInfo;
 
-		public Grid(Game1 game, int gridSize, int halfWidth, int halfHeight, int lineWidth)
+		public Grid(ProfielWerkstuk game, int gridSize, int halfWidth, int halfHeight, int lineWidth)
 		{
-			Game = game;
+			_game = game;
 			GridSize = gridSize;
 			HalfWidth = halfWidth;
 			HalfHeight = halfHeight;
@@ -70,49 +71,9 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 
 		public void DrawGridSquares(SpriteBatch spriteBatch)
 		{
-			for (int index = 0; index < _gridElements.Length; index++)
+			foreach (GridElement element in _gridElements)
 			{
-				int x = index % (2 * HalfWidth);
-				int y = index / (2 * HalfWidth);
-				GridElement element = _gridElements[y, x];
-
-				switch (element.Type)
-				{
-					case GridElementType.Solid:
-						spriteBatch.FillRectangle(GetGridVector2(x, y), new Vector2(GridSize, GridSize), Color.DarkGray);
-						break;
-					case GridElementType.Start:
-						if (Game.InputManager.DragElement?.Type == GridElementType.Start)
-							spriteBatch.FillRectangle(GetGridVector2(x, y), new Vector2(GridSize, GridSize), new Color(0, 161, 0));
-						else
-							spriteBatch.FillRectangle(GetGridVector2(x, y), new Vector2(GridSize, GridSize), Color.Green);
-						break;
-					case GridElementType.End:
-						if (Game.InputManager.DragElement?.Type == GridElementType.End)
-							spriteBatch.FillRectangle(GetGridVector2(x, y), new Vector2(GridSize, GridSize), new Color(255, 66, 66));
-						else
-							spriteBatch.FillRectangle(GetGridVector2(x, y), new Vector2(GridSize, GridSize), Color.Red);
-						break;
-				}
-			}
-		}
-
-		public void DrawDragElement(SpriteBatch spriteBatch)
-		{
-			Vector2 mouseLocation = new Vector2(Game.InputManager.MouseState.X, Game.InputManager.MouseState.Y);
-			GridElement targetElement = GetGridElement(mouseLocation);
-			GridElement dragElement = Game.InputManager.DragElement;
-			if (targetElement == null || dragElement == null || ((targetElement.Type == GridElementType.Start || targetElement.Type == GridElementType.End)
-				 && targetElement.Type != dragElement.Type))
-				return;
-			switch (dragElement.Type)
-			{
-				case GridElementType.Start:
-					spriteBatch.FillRectangle(GetGridVector2(targetElement.X, targetElement.Y), new Vector2(GridSize, GridSize), Color.Green);
-					break;
-				case GridElementType.End:
-					spriteBatch.FillRectangle(GetGridVector2(targetElement.X, targetElement.Y), new Vector2(GridSize, GridSize), Color.Red);
-					break;
+				element.Draw(spriteBatch, this, _draggingInfo);
 			}
 		}
 
@@ -138,7 +99,19 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 			}
 		}
 
-		public float GetStepRate()
+		public void Update(GameTime gameTime)
+		{
+			Vector2 mouseLocation = _game.InputManager.GetMouseLocation();
+
+			GridElement dragElement = _game.InputManager.DragElement;
+			GridElement targetElement = GetGridElement(mouseLocation);
+
+			bool bothNotNull = dragElement != null && targetElement != null;
+			_draggingInfo.DragElement = bothNotNull ? dragElement : null;
+			_draggingInfo.TargetElement = bothNotNull ? targetElement : null;
+		}
+
+		private float GetStepRate()
 		{
 			return GridSize + LineWidth / 2 + 1;
 		}
@@ -154,7 +127,7 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 
 		public GridElement GetGridElement(Vector2 clickLocation)
 		{
-			Vector2 worldPos = Game.CameraManager.Camera.ScreenToWorld(clickLocation);
+			Vector2 worldPos = _game.CameraManager.Camera.ScreenToWorld(clickLocation);
 			float stepRate = GetStepRate();
 			Vector2 correctedPos = worldPos + new Vector2(stepRate*HalfWidth, stepRate*HalfHeight);
 			int xIndex = (int)(correctedPos.X / stepRate);
@@ -190,7 +163,7 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 				return;
 
 			GridElement element = GetGridElement(mouseLocation);
-			if(element == null)
+			if(element == null || element.Type == GridElementType.Start || element.Type == GridElementType.End)
 				return;
 			if (GridHoldType == GridElementType.Null)
 			{
@@ -210,5 +183,16 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 		{
 			return AlgorithmActive ? null : _startElement;
 		}
+
+		public DraggingInfo GetDraggingInfo()
+		{
+			return _draggingInfo;
+		}
+	}
+
+	public struct DraggingInfo
+	{
+		public GridElement DragElement;
+		public GridElement TargetElement;
 	}
 }

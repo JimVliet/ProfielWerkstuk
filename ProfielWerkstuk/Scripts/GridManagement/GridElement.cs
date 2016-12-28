@@ -1,18 +1,132 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended.Shapes;
+using ProfielWerkstuk.Scripts.Pathfinding;
 
 namespace ProfielWerkstuk.Scripts.GridManagement
 {
 	public class GridElement
 	{
-		public int X;
-		public int Y;
+		public readonly int X;
+		public readonly int Y;
+		private readonly List<ResultInfo> _resultInfoList;
 		public GridElementType Type = GridElementType.Empty;
 
 		public GridElement(int x, int y)
 		{
 			X = x;
 			Y = y;
+			_resultInfoList = new List<ResultInfo>();
+		}
+
+		public ResultInfo GetResultInfo()
+		{
+			return _resultInfoList.Count > 0 ? _resultInfoList[_resultInfoList.Count-1] : null;
+		}
+
+		public void AttachResultInfo(ResultInfo resultInfo)
+		{
+			_resultInfoList.Add(resultInfo);
+		}
+
+		public bool HasResultInfo()
+		{
+			return _resultInfoList.Count > 0;
+		}
+
+		public bool RemoveLastInfo()
+		{
+			if(_resultInfoList.Count <= 0)
+				return false;
+
+			_resultInfoList.RemoveAt(_resultInfoList.Count-1);
+			return true;
+		}
+
+		public void ClearResultInfo()
+		{
+			if(HasResultInfo())
+				_resultInfoList.Clear();
+		}
+
+		private bool IsBeingDraggedOver(DraggingInfo dragInfo)
+		{
+			return dragInfo.TargetElement?.X == X && dragInfo.TargetElement.Y == Y;
+		}
+
+		private bool IsDragging(DraggingInfo dragInfo)
+		{
+			return dragInfo.DragElement?.X == X && dragInfo.DragElement.Y == Y;
+		}
+
+		public void Draw(SpriteBatch spriteBatch, Grid grid, DraggingInfo dragInfo)
+		{
+			if (dragInfo.DragElement != null && Type != GridElementType.Start && Type != GridElementType.End && IsBeingDraggedOver(dragInfo))
+			{
+				DrawDragElement(spriteBatch, grid, dragInfo.DragElement);
+				return;
+			}
+
+			if (!HasResultInfo() && Type == GridElementType.Empty)
+				return;
+
+			spriteBatch.FillRectangle(grid.GetGridVector2(X, Y), new Vector2(grid.GridSize, grid.GridSize),
+				Type == GridElementType.Empty ? GetResultInfo().GetColor() : GetDrawingColor(dragInfo));
+		}
+
+		private void DrawDragElement(SpriteBatch spriteBatch, Grid grid, GridElement dragElement)
+		{
+			spriteBatch.FillRectangle(grid.GetGridVector2(X, Y), new Vector2(grid.GridSize, grid.GridSize), dragElement.GetDragElementColor());
+		}
+
+		private Color GetDragElementColor()
+		{
+			switch (Type)
+			{
+				case GridElementType.Start:
+					return Color.Green;
+				case GridElementType.End:
+					return Color.Red;
+			}
+
+			return Color.Yellow;
+		}
+
+		public List<GridElement> GetPathToStart()
+		{
+			if(!HasResultInfo())
+				return null;
+
+			List<GridElement> gridElements = new List<GridElement>
+			{
+				this
+			};
+
+			GridElement previous = GetResultInfo().PreviousElement;
+			while (previous != null)
+			{
+				gridElements.Add(previous);
+
+				previous = previous.GetResultInfo().PreviousElement;
+			}
+
+			return gridElements;
+		}
+
+		private Color GetDrawingColor(DraggingInfo dragInfo)
+		{
+			switch (Type)
+			{
+				case GridElementType.Solid:
+					return Color.DarkGray;
+				case GridElementType.Start:
+					return IsDragging(dragInfo) ? new Color(0, 161, 0) : Color.Green;
+				case GridElementType.End:
+					return IsDragging(dragInfo) ? new Color(255, 66, 66) : Color.Red;
+			}
+			return Color.Yellow;
 		}
 
 		public List<GridElement> GetNeighbourElements(GridElement[,] grid, bool allowDiagonal)
@@ -33,17 +147,17 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 			if (allowBottom)
 				neighbours.Add(grid[Y + 1, X]);
 
-			if (allowDiagonal)
-			{
-				if (IsWithinRange(X - 1, Y - 1, grid) && grid[Y - 1, X - 1].Type != GridElementType.Solid && (allowTop || allowLeft))
-					neighbours.Add(grid[Y - 1, X - 1]);
-				if (IsWithinRange(X + 1, Y - 1, grid) && grid[Y - 1, X + 1].Type != GridElementType.Solid && (allowTop || allowRight))
-					neighbours.Add(grid[Y - 1, X + 1]);
-				if (IsWithinRange(X - 1, Y + 1, grid) && grid[Y + 1, X - 1].Type != GridElementType.Solid && (allowBottom || allowLeft))
-					neighbours.Add(grid[Y + 1, X - 1]);
-				if (IsWithinRange(X + 1, Y + 1, grid) && grid[Y + 1, X + 1].Type != GridElementType.Solid && (allowBottom || allowRight))
-					neighbours.Add(grid[Y + 1, X + 1]);
-			}
+			if (!allowDiagonal)
+				return neighbours;
+
+			if (IsWithinRange(X - 1, Y - 1, grid) && grid[Y - 1, X - 1].Type != GridElementType.Solid && (allowTop || allowLeft))
+				neighbours.Add(grid[Y - 1, X - 1]);
+			if (IsWithinRange(X + 1, Y - 1, grid) && grid[Y - 1, X + 1].Type != GridElementType.Solid && (allowTop || allowRight))
+				neighbours.Add(grid[Y - 1, X + 1]);
+			if (IsWithinRange(X - 1, Y + 1, grid) && grid[Y + 1, X - 1].Type != GridElementType.Solid && (allowBottom || allowLeft))
+				neighbours.Add(grid[Y + 1, X - 1]);
+			if (IsWithinRange(X + 1, Y + 1, grid) && grid[Y + 1, X + 1].Type != GridElementType.Solid && (allowBottom || allowRight))
+				neighbours.Add(grid[Y + 1, X + 1]);
 
 			return neighbours;
 		}
@@ -53,7 +167,7 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 			return Math.Sqrt((X - element.X) * (X - element.X) + (Y - element.Y) * (Y - element.Y));
 		}
 
-		public static bool IsWithinRange(int x, int y, GridElement[,] grid)
+		private static bool IsWithinRange(int x, int y, GridElement[,] grid)
 		{
 			return x >= 0 && x < grid.GetLength(1) && y >= 0 && y < grid.GetLength(0);
 		}

@@ -1,116 +1,118 @@
-﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using ProfielWerkstuk.Scripts.GridManagement;
-using ProfielWerkstuk.Scripts.GUI;
 
 namespace ProfielWerkstuk.Scripts.Events
 {
 	public class InputManager
 	{
-		public Vector2 LastLeftClick;
-		public Game1 Game;
 		public GridElement DragElement;
-		public MouseState MouseState;
-		public KeyboardState KeyboardState;
-		public MouseState OldMouseState;
-		public KeyboardState OldKeyboardState;
-		public List<Menu> EscapeTriggerList = new List<Menu>();
+		private MouseState _mouseState;
+		private KeyboardState _keyboardState;
+		private MouseState _oldMouseState;
+		private KeyboardState _oldKeyboardState;
+		private readonly ProfielWerkstuk _game;
+		private Vector2 _lastLeftClick;
 		private bool _outsideMenuClick;
 
-		public InputManager(Game1 game)
+		public InputManager(ProfielWerkstuk game)
 		{
-			Game = game;
+			_game = game;
 		}
 
 		public void Update()
 		{
-			KeyboardState = Keyboard.GetState();
-			MouseState = Mouse.GetState();
-			Vector2 clickLocation = new Vector2(MouseState.X, MouseState.Y);
+			_keyboardState = Keyboard.GetState();
+			_mouseState = Mouse.GetState();
+			Vector2 clickLocation = GetMouseLocation();
 
+			_game.UserInterface.CheckMouseHover(clickLocation);
 			CheckClickEvent(clickLocation);
 			CheckRightClickEvent(clickLocation);
-			Game.UserInterface.CheckMouseHover(clickLocation);
 			CheckScroll();
 			EscapePushed();
 
-			OldMouseState = MouseState;
-			OldKeyboardState = KeyboardState;
+			_oldMouseState = _mouseState;
+			_oldKeyboardState = _keyboardState;
 		}
 
-		public void CheckRightClickEvent(Vector2 clickLocation)
+		public Vector2 GetMouseLocation()
 		{
-			if (MouseState.RightButton == ButtonState.Pressed)
+			return new Vector2(_mouseState.X, _mouseState.Y);
+		}
+
+		private void CheckRightClickEvent(Vector2 clickLocation)
+		{
+			if (_mouseState.RightButton == ButtonState.Pressed)
 			{
-				if (OldMouseState.RightButton == ButtonState.Pressed)
+				if (_oldMouseState.RightButton == ButtonState.Pressed)
 					RightMouseHold(clickLocation);
 				else
-					RightMouseClick(clickLocation);
+					RightMouseClick();
 			}
-			else if (OldMouseState.RightButton == ButtonState.Pressed)
-				RightMouseRelease(clickLocation);
+			else if (_oldMouseState.RightButton == ButtonState.Pressed)
+				RightMouseRelease();
 		}
 
-		public void RightMouseRelease(Vector2 clickLocation)
+		private void RightMouseRelease()
 		{
-			Game.Grid.GridHoldType = GridElementType.Null;
+			_game.Grid.GridHoldType = GridElementType.Null;
 		}
 
-		public void RightMouseHold(Vector2 clickLocation)
+		private void RightMouseHold(Vector2 clickLocation)
 		{
-			if(Game.UserInterface.OutsideMenus(clickLocation) && Game.UserInterface.AllowClicking())
-				Game.Grid.GridHoldClick(clickLocation);
+			if(_game.UserInterface.GetMenu(clickLocation) == null && _game.UserInterface.AllowClicking())
+				_game.Grid.GridHoldClick(clickLocation);
 		}
 
-		public void RightMouseClick(Vector2 clickLocation)
+		private void RightMouseClick()
 		{
 			
 		}
 
-		public void EscapePushed()
+		private void EscapePushed()
 		{
-			if (!(KeyboardState.IsKeyDown(Keys.Escape) && !OldKeyboardState.IsKeyDown(Keys.Escape)))
+			if (!(_keyboardState.IsKeyDown(Keys.Escape) && !_oldKeyboardState.IsKeyDown(Keys.Escape)))
 				return;
-			Game.UserInterface.SwitchState();
+			_game.UserInterface.SwitchState();
 		}
 
-		public void CheckClickEvent(Vector2 clickLocation)
+		private void CheckClickEvent(Vector2 clickLocation)
 		{
-			if(OldMouseState.LeftButton == ButtonState.Released &&
-				MouseState.LeftButton == ButtonState.Pressed)
+			if(_oldMouseState.LeftButton == ButtonState.Released &&
+				_mouseState.LeftButton == ButtonState.Pressed)
 				LeftClickEvent(clickLocation);
-			if (OldMouseState.LeftButton == ButtonState.Pressed)
+			if (_oldMouseState.LeftButton == ButtonState.Pressed)
 			{
-				if(MouseState.LeftButton == ButtonState.Released)
+				if(_mouseState.LeftButton == ButtonState.Released)
 					LeftReleaseEvent(clickLocation);
-				else if (Game.UserInterface.OutsideMenus(clickLocation))
+				else if (_game.UserInterface.GetMenu(clickLocation) == null)
 				{
 					LeftDragEvent();
 				}
 			}
 		}
 
-		public void CheckScroll()
+		private void CheckScroll()
 		{
-			int deltaScroll = MouseState.ScrollWheelValue - OldMouseState.ScrollWheelValue;
+			int deltaScroll = _mouseState.ScrollWheelValue - _oldMouseState.ScrollWheelValue;
 			if (deltaScroll != 0)
 				ScrollEvent(deltaScroll);
 		}
 
-		public void ScrollEvent(int deltaScroll)
+		private void ScrollEvent(int deltaScroll)
 		{
-			if(Game.UserInterface.AllowClicking())
-				Game.CameraManager.CheckScroll(deltaScroll);
+			if(_game.UserInterface.AllowClicking())
+				_game.CameraManager.CheckScroll(deltaScroll);
 		}
 
-		public void LeftClickEvent(Vector2 clickLocation)
+		private void LeftClickEvent(Vector2 clickLocation)
 		{
-			_outsideMenuClick = Game.UserInterface.ClickEvent(clickLocation);
+			_outsideMenuClick = _game.UserInterface.ClickEvent(clickLocation);
 
-			if (_outsideMenuClick && Game.UserInterface.AllowClicking())
+			if (_outsideMenuClick && _game.UserInterface.AllowClicking())
 			{
-				GridElement element = Game.Grid.GetGridElement(clickLocation);
+				GridElement element = _game.Grid.GetGridElement(clickLocation);
 				if (element != null && (element.Type == GridElementType.Start || element.Type == GridElementType.End))
 				{
 					DragElement = element;
@@ -118,44 +120,48 @@ namespace ProfielWerkstuk.Scripts.Events
 			}
 
 			//Store the new lastLeftClick location
-			LastLeftClick = clickLocation;
+			_lastLeftClick = clickLocation;
 		}
 
-		public void LeftReleaseEvent(Vector2 clickLocation)
+		private void LeftReleaseEvent(Vector2 clickLocation)
 		{
-			if(!_outsideMenuClick || !Game.UserInterface.AllowClicking())
+			if (!_outsideMenuClick)
+			{
+				_game.UserInterface.LeftReleaseEvent(clickLocation);
+				return;
+			}
+
+			if(!_game.UserInterface.AllowClicking())
 				return;
 
 			if (DragElement != null)
 			{
-				GridElement element = Game.Grid.GetGridElement(clickLocation);
+				GridElement element = _game.Grid.GetGridElement(clickLocation);
 				if (element != null && element.Type != GridElementType.End && element.Type != GridElementType.Start)
 				{
 					if(DragElement.Type == GridElementType.Start)
-						Game.Grid.ChangeStartElement(element);
+						_game.Grid.ChangeStartElement(element);
 					else
-						Game.Grid.ChangeEndElement(element);
+						_game.Grid.ChangeEndElement(element);
 				}
 
 				DragElement = null;
 			}
 			else
 			{
-				Vector2 deltaClick = clickLocation - LastLeftClick;
+				Vector2 deltaClick = clickLocation - _lastLeftClick;
 
 				if(deltaClick.Length() > 2)
 					return;
 
-				Game.Grid.GridClicked(clickLocation);
+				_game.Grid.GridClicked(clickLocation);
 			}
-
-			
 		}
 
-		public void LeftDragEvent()
+		private void LeftDragEvent()
 		{
-			if (DragElement == null && Game.UserInterface.AllowClicking())
-				Game.CameraManager.CheckPanning(MouseState, OldMouseState);
+			if (DragElement == null && _game.UserInterface.AllowClicking() && _outsideMenuClick)
+				_game.CameraManager.CheckPanning(_mouseState, _oldMouseState);
 		}
 	}
 }

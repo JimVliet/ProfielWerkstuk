@@ -1,50 +1,28 @@
-﻿using Microsoft.Xna.Framework;
-using ProfielWerkstuk.Scripts.Utility;
+﻿using ProfielWerkstuk.Scripts.GUI.Menus;
 
 namespace ProfielWerkstuk.Scripts.GUI.States
 {
 	public class MainMenuState : BaseUserInterfaceState
 	{
-		public MainMenuState(Game1 game) : base(game, UserInterfaceStates.MainMenu)
+		public MainMenuState(ProfielWerkstuk game, UserInterfaceManager manager) : base(game, manager, UserInterfaceStates.MainMenu)
 		{
 			AllowClicking = false;
+			Game.EventHandlers.BackButtonClicked += BackButtonClick;
+			Game.EventHandlers.ExitButtonClicked += ExitButtonClick;
 		}
 
-		public new void Setup()
+		public override void Setup()
 		{
-			SetupMainMenu();
+			MainMenu menu = new MainMenu(this);
+			menu.AddToState();
 		}
 
-		private void SetupMainMenu()
-		{
-			float windowWidth = Utilities.GetWindowWidth(Game);
-			float windowHeight = Utilities.GetWindowHeight(Game);
-
-			//Setup mainmenu
-			Menu mainMenu = CreateMenu(new Vector2(windowWidth / 2f, windowHeight / 2f));
-			Game.InputManager.EscapeTriggerList.Add(mainMenu);
-
-			Button exitButton = new Button(Game.UserInterface.Font28, new Vector2(), "Exit")
-			{
-				ClickedEvent = ExitButtonClick
-			};
-			exitButton.Size = new Vector2(250f, exitButton.Size.Y);
-
-			Button backButton = new Button(Game.UserInterface.Font28, new Vector2(), "Back")
-			{
-				ClickedEvent = BackButtonClick
-			};
-
-			mainMenu.AddMenuItem(exitButton);
-			mainMenu.AddMenuItem(backButton);
-		}
-
-		private void BackButtonClick(IMenuItem item, Vector2 location)
+		private void BackButtonClick()
 		{
 			Game.UserInterface.SwitchToState(UserInterfaceStates.GridMap);
 		}
 
-		private void ExitButtonClick(IMenuItem item, Vector2 location)
+		private void ExitButtonClick()
 		{
 			Game.Exit();
 		}
