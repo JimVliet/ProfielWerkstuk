@@ -3,18 +3,21 @@ using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ProfielWerkstuk.Scripts.GridManagement;
+using ProfielWerkstuk.Scripts.GUI;
 using ProfielWerkstuk.Scripts.Pathfinding.AlgorithmDisplayers;
+using ProfielWerkstuk.Scripts.Pathfinding.Algorithms;
 using ProfielWerkstuk.Scripts.Utility;
 
 namespace ProfielWerkstuk.Scripts.Pathfinding
 {
 	public class AlgorithmManager
 	{
-		public readonly IDisplayer Displayer;
+		public DisplayerBase Displayer;
 		private readonly ProfielWerkstuk _game;
 		private Thread _algorithmThread;
 		private IAlgorithm _currentAlgorithm;
 		private bool _allowDiagonal;
+		private bool _showArrows;
 
 		private bool _paused;
 		public bool Paused
@@ -26,7 +29,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 
 				if (!value && DisplayerEndedAnimating)
 				{
-					_game.EventHandlers.CalculateDijkstra?.Invoke();
+					Calculate(_currentAlgorithm.Type);
 				}
 			}
 		}
@@ -39,7 +42,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 			{
 				_displayerEndedAnimating = value;
 				if(value)
-					_game.EventHandlers.PlayPauseEvent?.Invoke(true);
+					GetEventHandlers().PlayPauseEvent?.Invoke(true);
 			}
 		}
 
@@ -51,32 +54,58 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 			{
 				_isCalculating = value;
 				_game.Grid.AlgorithmActive = value;
-				_game.EventHandlers.CalculateAlgorithm?.Invoke(value, _currentAlgorithm.GetName());
+				GetEventHandlers().CalculateAlgorithm?.Invoke(value, _currentAlgorithm.GetName());
 			}
 		}
 
 		public AlgorithmManager(ProfielWerkstuk game)
 		{
 			_game = game;
-			Displayer = new DijkstraDisplayer(_game);
-			_game.EventHandlers.CalculateDijkstra += Calculate;
-			_game.EventHandlers.DiagonalButtonClicked += DiagonalButtonClicked;
-			_game.EventHandlers.PlayPauseButtonClicked += PlayPauseButtonClicked;
-			_game.EventHandlers.PlayPauseEvent += PlayPauseEvent;
+			GetEventHandlers().CalculateDijkstra += CalculateDijkstra;
+			GetEventHandlers().CalculateBfs += CalculateBfs;
+			GetEventHandlers().DiagonalButtonClicked += DiagonalButtonClicked;
+			GetEventHandlers().PlayPauseButtonClicked += PlayPauseButtonClicked;
+			GetEventHandlers().PlayPauseEvent += PlayPauseEvent;
+			GetEventHandlers().ShowArrowsClicked += ShowArrowsClicked;
+			GetEventHandlers().ShowArrows += ShowArrows;
 		}
 
 		public int GetExplored()
 		{
-			return Displayer.GetExplored();
+			return Displayer?.GetExplored() ?? 0;
 		}
 
-		private void Calculate()
+		private void Calculate(AlgorithmType type)
 		{
 			if(_algorithmThread != null && _algorithmThread.IsAlive)
 				return;
 
-			_currentAlgorithm = new Dijkstra(_game.Grid.GetGridMap(), _game.Grid.GetStartElement(), _allowDiagonal);
-			_algorithmThread = new Thread(_currentAlgorithm.CalculatePath);
+			switch (type)
+			{
+				case AlgorithmType.Dijkstra:
+					if (_currentAlgorithm == null || _currentAlgorithm.Type != AlgorithmType.Dijkstra)
+					{
+						Displayer?.Dispose();
+						Displayer = new DijkstraDisplayer(_game);
+					}
+					
+					_currentAlgorithm = new Dijkstra(_game.Grid.GetGridMap(), _game.Grid.GetStartElement(), _allowDiagonal);
+					_algorithmThread = new Thread(_currentAlgorithm.CalculatePath);
+					break;
+				case AlgorithmType.BreadthFirstSearch:
+					if (_currentAlgorithm == null || _currentAlgorithm.Type != AlgorithmType.BreadthFirstSearch)
+					{
+						Displayer?.Dispose();
+						Displayer = new BfsDisplayer(_game);
+					}
+
+					_currentAlgorithm = new BreadthFirstSearch(_game.Grid.GetGridMap(), _game.Grid.GetStartElement(), _allowDiagonal);
+					_algorithmThread = new Thread(_currentAlgorithm.CalculatePath);
+					break;
+				default:
+					return;
+			}
+			
 
 			IsCalculating = true;
 			_algorithmThread.Start();
@@ -96,7 +125,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 				Displayer.CleanUp();
 
 				DisplayerEndedAnimating = false;
-				_game.EventHandlers.PlayPauseEvent?.Invoke(false);
+				GetEventHandlers().PlayPauseEvent?.Invoke(false);
 			}
 
 			Displayer?.Update(gameTime);
@@ -134,22 +163,52 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 		private void DiagonalButtonClicked()
 		{
 			_allowDiagonal = !_allowDiagonal;
-			_game.EventHandlers.ChangeDiagonalOption?.Invoke(_allowDiagonal);
+			GetEventHandlers().ChangeDiagonalOption?.Invoke(_allowDiagonal);
 		}
 
 		private void PlayPauseButtonClicked()
 		{
-			_game.EventHandlers.PlayPauseEvent?.Invoke(!Paused);
+			GetEventHandlers().PlayPauseEvent?.Invoke(!Paused);
 		}
 
 		private void PlayPauseEvent(bool paused)
 		{
 			Paused = paused;
 		}
+
+		private void ShowArrowsClicked()
+		{
+			GetEventHandlers().ShowArrows?.Invoke(!_showArrows);
+		}
+
+		private void ShowArrows(bool showArrows)
+		{
+			_showArrows = showArrows;
+		}
+
+		private EventHandlers GetEventHandlers()
+		{
+			return _game.EventHandlers;
+		}
+
+		public bool ShowArrows()
+		{
+			return _showArrows;
+		}
+
+		private void CalculateDijkstra()
+		{
+			Calculate(AlgorithmType.Dijkstra);
+		}
+
+		private void CalculateBfs()
+		{
+			Calculate(AlgorithmType.BreadthFirstSearch);
+		}
 	}
 
 	public enum AlgorithmType
 	{
-		Dijkstra, AStar
+		Dijkstra, AStar, BreadthFirstSearch
 	}
 }

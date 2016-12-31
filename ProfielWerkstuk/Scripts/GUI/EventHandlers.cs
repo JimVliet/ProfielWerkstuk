@@ -5,6 +5,7 @@ namespace ProfielWerkstuk.Scripts.GUI
 	public class EventHandlers
 	{
 		public ButtonClicked CalculateDijkstra;
+		public ButtonClicked CalculateBfs;
 		public ButtonClicked OpenMainMenu;
 		public ButtonClicked DiagonalButtonClicked;
 		public ButtonClicked PlayPauseButtonClicked;
@@ -16,11 +17,14 @@ namespace ProfielWerkstuk.Scripts.GUI
 		public ButtonClicked FastBackwardEnd;
 		public ButtonClicked SkipToStartClicked;
 		public ButtonClicked SkipToEndClicked;
+		public ButtonClicked ShowArrowsClicked;
+		public ButtonClicked ClearGridClicked;
 
 		public TextUpdate TextUpdate;
 		public CalculateAlgorithm CalculateAlgorithm;
 		public ChangeDiagonalOption ChangeDiagonalOption;
 		public PlayPauseEvent PlayPauseEvent;
+		public ShowArrows ShowArrows;
 	}
 	public delegate void TextUpdate(GridElement element, int explored);
 
@@ -31,4 +35,6 @@ namespace ProfielWerkstuk.Scripts.GUI
 	public delegate void PlayPauseEvent(bool isPaused);
 
 	public delegate void ButtonClicked();
+
+	public delegate void ShowArrows(bool showArrows);
 }

@@ -5,8 +5,8 @@ namespace ProfielWerkstuk.Scripts.GUI.BaseClasses
 {
 	public class ControlMenuElement : BaseMenuElement
 	{
-		public Texture2D Texture;
-		protected bool _isBeingHovered;
+		protected Texture2D Texture;
+		private bool _isBeingHovered;
 
 		public ControlMenuElement(MenuContainer parentContainer, Texture2D texture) : base(parentContainer)
 		{

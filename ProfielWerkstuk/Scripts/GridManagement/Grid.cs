@@ -39,6 +39,8 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 			float stepRate = GetStepRate();
 			GridBounds = new RectangleF(-halfWidth * stepRate, -halfHeight * stepRate,
 				2*halfWidth * stepRate, 2*halfHeight * stepRate);
+
+			_game.EventHandlers.ClearGridClicked += ClearGridClicked;
 		}
 
 		public void GenerateGrid()
@@ -73,7 +75,7 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 		{
 			foreach (GridElement element in _gridElements)
 			{
-				element.Draw(spriteBatch, this, _draggingInfo);
+				element.Draw(spriteBatch, this, _draggingInfo, _game.AlgorithmManager.ShowArrows());
 			}
 		}
 
@@ -120,8 +122,8 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 		{
 			float stepRate = GetStepRate();
 
-			float xCoord = (stepRate * -HalfWidth) + (x * stepRate) + LineWidth / 2f;
-			float yCoord = (stepRate * -HalfHeight) + (y * stepRate) + LineWidth / 2f;
+			float xCoord = stepRate * -HalfWidth + x * stepRate + LineWidth / 2f;
+			float yCoord = stepRate * -HalfHeight + y * stepRate + LineWidth / 2f;
 			return new Vector2(xCoord, yCoord);
 		}
 
@@ -184,9 +186,18 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 			return AlgorithmActive ? null : _startElement;
 		}
 
-		public DraggingInfo GetDraggingInfo()
+		private void ClearGrid()
 		{
-			return _draggingInfo;
+			foreach (var element in _gridElements)
+			{
+				if(!element.IsSpecial())
+					element.Type = GridElementType.Empty;
+			}
+		}
+
+		private void ClearGridClicked()
+		{
+			ClearGrid();
 		}
 	}
 

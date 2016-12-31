@@ -10,12 +10,6 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 	{
 		private readonly TextureManager _textureManager;
 
-		public AlgorithmControls(BaseUserInterfaceState state, Vector2 pos, TextureManager textures) : base(state, pos)
-		{
-			_textureManager = textures;
-			SetupControls();
-		}
-
 		public AlgorithmControls(BaseUserInterfaceState state, TextureManager textures) : base(state, HorizontalAlignment.Center, VerticalAlignment.Bottom)
 		{
 			_textureManager = textures;

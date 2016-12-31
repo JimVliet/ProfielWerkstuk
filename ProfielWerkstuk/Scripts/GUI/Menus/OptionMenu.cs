@@ -8,11 +8,6 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 {
 	public class OptionMenu : UserInterfaceMenu
 	{
-		public OptionMenu(BaseUserInterfaceState state, Vector2 pos) : base(state, pos)
-		{
-			SetupContainers();
-		}
-
 		public OptionMenu(BaseUserInterfaceState state) : base(state, HorizontalAlignment.Right, VerticalAlignment.Bottom)
 		{
 			SetupContainers();
@@ -97,9 +92,28 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 	{
 		public ShowArrowsButton(MenuContainer parentContainer, string text, SpriteFont font) : base(parentContainer, text, font)
 		{
-			ButtonColor = Color.Green;
-			ButtonHoverColor = new Color(40, 128, 40);
+			ButtonColor = Color.Red;
+			ButtonHoverColor = new Color(255, 30, 30);
 			MatchToContainer = false;
+			GetEventHandlers().ShowArrows += ShowArrowsOptionChanged;
+		}
+
+		public override void LeftClickEvent()
+		{
+			GetEventHandlers().ShowArrowsClicked?.Invoke();
+		}
+
+		private void ShowArrowsOptionChanged(bool diagonal)
+		{
+			if (diagonal)
+			{
+				ButtonColor = Color.Green;
+				ButtonHoverColor = new Color(40, 128, 40);
+				return;
+			}
+
+			ButtonColor = Color.Red;
+			ButtonHoverColor = new Color(255, 30, 30);
 		}
 	}
 }

@@ -19,16 +19,26 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 
 		private void SetupMenu()
 		{
-			MenuContainer container = new MenuContainer(this);
+			MenuContainer dijkstraContainer = new MenuContainer(this);
 
-			DijkstraButton dijkstra = new DijkstraButton(container, "Dijkstra", State.UiManager.Font16)
+			DijkstraButton dijkstra = new DijkstraButton(dijkstraContainer, "Dijkstra", State.UiManager.Font16)
 			{
 				PreferedSize = new Vector2(160, 20),
 				Padding = new Vector2(10, 10)
 			};
 
 			dijkstra.AddToContainer();
-			container.AddToMenu();
+			dijkstraContainer.AddToMenu();
+
+			MenuContainer bfsContainer = new MenuContainer(this);
+
+			BfsButton bfs = new BfsButton(bfsContainer, "Breadth first search", State.UiManager.Font16)
+			{
+				Padding = new Vector2(10, 10)
+			};
+
+			bfs.AddToContainer();
+			bfsContainer.AddToMenu();
 		}
 	}
 
@@ -42,6 +52,19 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 		public override void LeftClickEvent()
 		{
 			GetEventHandlers().CalculateDijkstra?.Invoke();
+		}
+	}
+
+	public class BfsButton : ButtonMenuElement
+	{
+		public BfsButton(MenuContainer parentContainer, string text, SpriteFont font) : base(parentContainer, text, font)
+		{
+
+		}
+
+		public override void LeftClickEvent()
+		{
+			GetEventHandlers().CalculateBfs?.Invoke();
 		}
 	}
 }

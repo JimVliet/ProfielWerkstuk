@@ -2,12 +2,12 @@
 using System.Linq;
 using ProfielWerkstuk.Scripts.GridManagement;
 
-namespace ProfielWerkstuk.Scripts.Pathfinding
+namespace ProfielWerkstuk.Scripts.Pathfinding.Algorithms
 {
 	public class Dijkstra : IAlgorithm
 	{
 		private readonly GridElement[,] _gridElements;
-		private List<GridElement> _resultPath;
+		private readonly List<GridElement> _resultPath = new List<GridElement>();
 		private readonly List<ResultInfo> _resultInfo = new List<ResultInfo>();
 		private readonly GridElement _startElement;
 		private readonly bool _allowDiagonal;
@@ -46,8 +46,6 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 
 				if (smallest.Type == GridElementType.End)
 				{
-					_resultPath = new List<GridElement>();
-
 					while (previous.ContainsKey(smallest))
 					{
 						_resultPath.Add(smallest);

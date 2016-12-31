@@ -21,6 +21,11 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 			_resultInfoList = new List<ResultInfo>();
 		}
 
+		public bool IsSpecial()
+		{
+			return Type == GridElementType.Start || Type == GridElementType.End;
+		}
+
 		public ResultInfo GetResultInfo()
 		{
 			return _resultInfoList.Count > 0 ? _resultInfoList[_resultInfoList.Count-1] : null;
@@ -61,7 +66,7 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 			return dragInfo.DragElement?.X == X && dragInfo.DragElement.Y == Y;
 		}
 
-		public void Draw(SpriteBatch spriteBatch, Grid grid, DraggingInfo dragInfo)
+		public void Draw(SpriteBatch spriteBatch, Grid grid, DraggingInfo dragInfo, bool showArrows)
 		{
 			if (dragInfo.DragElement != null && Type != GridElementType.Start && Type != GridElementType.End && IsBeingDraggedOver(dragInfo))
 			{
@@ -69,11 +74,20 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 				return;
 			}
 
-			if (!HasResultInfo() && Type == GridElementType.Empty)
-				return;
+			if (!HasResultInfo())
+			{
+				if(Type == GridElementType.Empty)
+					return;
 
-			spriteBatch.FillRectangle(grid.GetGridVector2(X, Y), new Vector2(grid.GridSize, grid.GridSize),
+				spriteBatch.FillRectangle(grid.GetGridVector2(X, Y), new Vector2(grid.GridSize, grid.GridSize),
+					GetDrawingColor(dragInfo));
+				return;
+			}
+
+			spriteBatch.FillRectangle(grid.GetGridVector2(X, Y), new Vector2(grid.GridSize, grid.GridSize), 
 				Type == GridElementType.Empty ? GetResultInfo().GetColor() : GetDrawingColor(dragInfo));
+			if(showArrows)
+				GetResultInfo().DrawArrow(spriteBatch, grid, 40, 10, Color.SaddleBrown);
 		}
 
 		private void DrawDragElement(SpriteBatch spriteBatch, Grid grid, GridElement dragElement)

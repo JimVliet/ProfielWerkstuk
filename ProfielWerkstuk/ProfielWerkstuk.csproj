@@ -95,11 +95,13 @@
     <Compile Include="Scripts\GUI\States\MainMenuState.cs" />
     <Compile Include="Scripts\GUI\Textures\TextureManager.cs" />
     <Compile Include="Scripts\GUI\UserInterfaceManager.cs" />
+    <Compile Include="Scripts\Pathfinding\AlgorithmDisplayers\BfsDisplayer.cs" />
+    <Compile Include="Scripts\Pathfinding\AlgorithmDisplayers\DisplayerBase.cs" />
     <Compile Include="Scripts\Pathfinding\AlgorithmDisplayers\DijkstraDisplayer.cs" />
     <Compile Include="Scripts\GUI\States\GridMapState.cs" />
-    <Compile Include="Scripts\Pathfinding\AlgorithmDisplayers\IDisplayer.cs" />
     <Compile Include="Scripts\Pathfinding\AlgorithmManager.cs" />
-    <Compile Include="Scripts\Pathfinding\Dijkstra.cs" />
+    <Compile Include="Scripts\Pathfinding\Algorithms\BreadthFirstSearch.cs" />
+    <Compile Include="Scripts\Pathfinding\Algorithms\Dijkstra.cs" />
     <Compile Include="Scripts\Pathfinding\IAlgorithm.cs" />
     <Compile Include="Scripts\Pathfinding\ResultInfo.cs" />
     <Compile Include="Scripts\Utility\Utilities.cs" />
