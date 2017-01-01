@@ -6,6 +6,7 @@ namespace ProfielWerkstuk.Scripts.GUI
 	{
 		public ButtonClicked CalculateDijkstra;
 		public ButtonClicked CalculateBfs;
+		public ButtonClicked CalculateDfs;
 		public ButtonClicked OpenMainMenu;
 		public ButtonClicked DiagonalButtonClicked;
 		public ButtonClicked PlayPauseButtonClicked;
@@ -19,12 +20,16 @@ namespace ProfielWerkstuk.Scripts.GUI
 		public ButtonClicked SkipToEndClicked;
 		public ButtonClicked ShowArrowsClicked;
 		public ButtonClicked ClearGridClicked;
+		public ButtonClicked GridPreviewClicked;
 
 		public TextUpdate TextUpdate;
 		public CalculateAlgorithm CalculateAlgorithm;
 		public ChangeDiagonalOption ChangeDiagonalOption;
 		public PlayPauseEvent PlayPauseEvent;
 		public ShowArrows ShowArrows;
+		public GetPreviewType GetPreviewType;
+		public PreviewTypeSwitched PreviewTypeSwitched;
+		public ShiftHeld ShiftHeld;
 	}
 	public delegate void TextUpdate(GridElement element, int explored);
 
@@ -36,5 +41,11 @@ namespace ProfielWerkstuk.Scripts.GUI
 
 	public delegate void ButtonClicked();
 
+	public delegate void PreviewTypeSwitched();
+
 	public delegate void ShowArrows(bool showArrows);
+
+	public delegate GridElementType GetPreviewType();
+
+	public delegate bool ShiftHeld();
 }

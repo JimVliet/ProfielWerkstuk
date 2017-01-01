@@ -18,18 +18,18 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 			Margin = new Vector2(10, 10);
 
 			MenuContainer textContainer = new MenuContainer(this);
-			CalculatingText calcText = new CalculatingText(textContainer, new Vector2(), "-", State.UiManager.Font16);
+			CalculatingText calcText = new CalculatingText(textContainer, new Vector2(), "-", State.UiManager.Font14);
 			calcText.AddToContainer();
 			textContainer.AddToMenu();
 
 			MenuContainer buttonContainer = new MenuContainer(this);
-			DiagonalButton diagonalButton = new DiagonalButton(buttonContainer, "Diagonal", State.UiManager.Font16)
+			DiagonalButton diagonalButton = new DiagonalButton(buttonContainer, "Diagonal", State.UiManager.Font14)
 			{
-				Padding = new Vector2(10, 10)
+				Padding = new Vector2(10)
 			};
-			ShowArrowsButton showArrowsButton = new ShowArrowsButton(buttonContainer, "Show arrows", State.UiManager.Font16)
+			ShowArrowsButton showArrowsButton = new ShowArrowsButton(buttonContainer, "Show arrows", State.UiManager.Font14)
 			{
-				Padding = new Vector2(10, 10)
+				Padding = new Vector2(10)
 			};
 			Vector2 maxSize = new Vector2(Math.Max(diagonalButton.Size.X, showArrowsButton.Size.X),
 				Math.Max(diagonalButton.Size.Y, showArrowsButton.Size.Y));

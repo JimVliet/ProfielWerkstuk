@@ -19,6 +19,7 @@ namespace ProfielWerkstuk.Scripts.GUI.States
 			SetupOptionMenu();
 			SetupToolTips();
 			SetupAlgorithmControls();
+			SetupGridTypePreview();
 		}
 
 		public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
@@ -28,6 +29,12 @@ namespace ProfielWerkstuk.Scripts.GUI.States
 			Game.EventHandlers.TextUpdate?.Invoke(element, explored);
 
 			DrawMenus(spriteBatch, gameTime);
+		}
+
+		private void SetupGridTypePreview()
+		{
+			GridTypePreviewMenu gridPreviewMenu = new GridTypePreviewMenu(this);
+			gridPreviewMenu.AddToState();
 		}
 
 		private void SetupAlgorithmMenu()

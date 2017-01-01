@@ -8,9 +8,9 @@ namespace ProfielWerkstuk.Scripts.GUI
 {
 	public class UserInterfaceManager
 	{
-		public SpriteFont Font28;
 		public SpriteFont Font24;
 		public SpriteFont Font16;
+		public SpriteFont Font14;
 		public readonly ProfielWerkstuk Game;
 		private BaseUserInterfaceState _uiState;
 		private readonly GridMapState _gridMapState;
@@ -56,6 +56,12 @@ namespace ProfielWerkstuk.Scripts.GUI
 					continue;
 
 				BaseMenuElement element = menu.CheckHover(mouseLocation);
+
+				if (element == null && _hoverElement != null)
+				{
+					_hoverElement.UnHover();
+					_hoverElement = null;
+				}
 
 				if (element == null || element.Equals(_hoverElement))
 					return;

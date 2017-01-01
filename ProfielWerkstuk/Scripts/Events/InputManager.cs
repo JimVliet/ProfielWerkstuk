@@ -18,6 +18,7 @@ namespace ProfielWerkstuk.Scripts.Events
 		public InputManager(ProfielWerkstuk game)
 		{
 			_game = game;
+			_game.EventHandlers.ShiftHeld += ShiftHeld;
 		}
 
 		public void Update()
@@ -31,9 +32,15 @@ namespace ProfielWerkstuk.Scripts.Events
 			CheckRightClickEvent(clickLocation);
 			CheckScroll();
 			EscapePushed();
+			CheckTabPush();
 
 			_oldMouseState = _mouseState;
 			_oldKeyboardState = _keyboardState;
+		}
+
+		private bool ShiftHeld()
+		{
+			return _keyboardState.IsKeyDown(Keys.LeftShift);
 		}
 
 		public Vector2 GetMouseLocation()
@@ -63,6 +70,12 @@ namespace ProfielWerkstuk.Scripts.Events
 		{
 			if(_game.UserInterface.GetMenu(clickLocation) == null && _game.UserInterface.AllowClicking())
 				_game.Grid.GridHoldClick(clickLocation);
+		}
+
+		private void CheckTabPush()
+		{
+			if(!_oldKeyboardState.IsKeyDown(Keys.Tab) && _keyboardState.IsKeyDown(Keys.Tab))
+				_game.EventHandlers.PreviewTypeSwitched?.Invoke();
 		}
 
 		private void RightMouseClick()

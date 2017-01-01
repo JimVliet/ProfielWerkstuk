@@ -10,11 +10,6 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 {
 	public class ToolTipsMenu : UserInterfaceMenu
 	{
-		public ToolTipsMenu(BaseUserInterfaceState state, Vector2 pos) : base(state, pos)
-		{
-			SetupTextElements();
-		}
-
 		public ToolTipsMenu(BaseUserInterfaceState state) : base(state, HorizontalAlignment.Left, VerticalAlignment.Bottom)
 		{
 			SetupTextElements();
@@ -26,20 +21,20 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 			BaseButtonDistance = 0;
 
 			MenuContainer menuContainer = new MenuContainer(this);
-			DistanceInfo distanceInfo = new DistanceInfo(menuContainer, new Vector2(-130, -48), 
-				"Distance to start: -", State.UiManager.Font16);
+			DistanceInfo distanceInfo = new DistanceInfo(menuContainer, new Vector2(-110, -39), 
+				"Distance to start: -", State.UiManager.Font14);
 			distanceInfo.AddToContainer();
 
-			PosInfo posInfo = new PosInfo(menuContainer, new Vector2(-130, -16),
-				"Position: -", State.UiManager.Font16);
+			PosInfo posInfo = new PosInfo(menuContainer, new Vector2(-110, -13),
+				"Position: -", State.UiManager.Font14);
 			posInfo.AddToContainer();
 
 			NodesExploredInfo nodesExplored = new NodesExploredInfo(menuContainer, 
-				new Vector2(-130, 16), "Nodes explored: -", State.UiManager.Font16);
+				new Vector2(-110, 13), "Nodes explored: -", State.UiManager.Font14);
 			nodesExplored.AddToContainer();
 
-			PercentExploredInfo percentExplored = new PercentExploredInfo(menuContainer, new Vector2(-130, 48), 
-				"Nodes explored: -", State.UiManager.Font16, State.Game.Grid);
+			PercentExploredInfo percentExplored = new PercentExploredInfo(menuContainer, new Vector2(-110, 39), 
+				"Nodes explored: -", State.UiManager.Font14, State.Game.Grid);
 			percentExplored.AddToContainer();
 			
 			menuContainer.AddToMenu();
@@ -57,7 +52,7 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 		private void UpdateDistance(GridElement element, int explored)
 		{
 			Text = "Distance to start: " + (element?.GetResultInfo() == null ? "-"
-					: Math.Round(element.GetResultInfo().Distance, 2).ToString(CultureInfo.CurrentCulture));
+					: Math.Round(element.GetResultInfo().GetAdjustedDistance(), 2).ToString(CultureInfo.CurrentCulture));
 		}
 	}
 

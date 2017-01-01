@@ -40,7 +40,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.AlgorithmDisplayers
 			
 		}
 
-		public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
+		public void Draw(SpriteBatch spriteBatch)
 		{
 			if(ResultInfo == null)
 				return;
@@ -56,7 +56,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.AlgorithmDisplayers
 		{
 			for (int i = 1; i < PathDrawingPoints.Count; i++)
 			{
-				spriteBatch.DrawLine(PathDrawingPoints[i - 1], PathDrawingPoints[i], Color.Orange, 4f);
+				spriteBatch.DrawLine(PathDrawingPoints[i - 1], PathDrawingPoints[i], Color.Red, 4f);
 			}
 		}
 

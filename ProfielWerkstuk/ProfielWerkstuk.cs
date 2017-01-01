@@ -87,9 +87,9 @@ namespace ProfielWerkstuk
 
 			// Create a new SpriteBatch, which can be used to draw textures.
 			_spriteBatch = new SpriteBatch(GraphicsDevice);
-			UserInterface.Font28 = Content.Load<SpriteFont>("Raleway28");
 			UserInterface.Font24 = Content.Load<SpriteFont>("Raleway24");
 			UserInterface.Font16 = Content.Load<SpriteFont>("Raleway16");
+			UserInterface.Font14 = Content.Load<SpriteFont>("Raleway14");
 
 			//Load controlMenu textures
 			TextureManager.Play = Content.Load<Texture2D>("Play");
@@ -137,12 +137,11 @@ namespace ProfielWerkstuk
 		protected override void Draw(GameTime gameTime)
 		{
 			GraphicsDevice.Clear(Color.WhiteSmoke);
-			// TODO: Add your drawing code 
 
 			_spriteBatch.Begin(transformMatrix: CameraManager.Camera.GetViewMatrix());
 			Grid.DrawGridLines(_spriteBatch);
 			Grid.DrawGridSquares(_spriteBatch);
-			AlgorithmManager.Draw(_spriteBatch, gameTime);
+			AlgorithmManager.Draw(_spriteBatch);
 			_spriteBatch.End();
 
 			//Draw UI

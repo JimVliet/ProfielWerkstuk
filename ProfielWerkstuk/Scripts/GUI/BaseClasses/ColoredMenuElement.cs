@@ -4,32 +4,36 @@ using MonoGame.Extended.Shapes;
 
 namespace ProfielWerkstuk.Scripts.GUI.BaseClasses
 {
-	public class ControlMenuElement : BaseMenuElement
+	public class ColoredMenuElement : BaseMenuElement
 	{
-		protected Texture2D Texture;
+		private readonly Vector2 _previewSize;
 		private bool _isBeingHovered;
 
-		protected ControlMenuElement(MenuContainer parentContainer, Texture2D texture) : base(parentContainer)
+		protected ColoredMenuElement(MenuContainer parentContainer, Vector2 preview) : base(parentContainer)
 		{
-			Texture = texture;
-			UpdateSize();
+			_previewSize = preview;
 		}
 
 		protected override Vector2 GetMinimalSize()
 		{
-			return new Vector2(Texture.Width + 2 * Padding.X, Texture.Height + 2 * Padding.Y);
+			return _previewSize + 2*Padding;
 		}
 
 		public override void Draw(SpriteBatch spriteBatch)
 		{
-			Vector2 drawLocation = GetPosition() - Size / 2;
+			Vector2 drawLocation = GetPosition() - Size / 2 + Padding;
 			drawLocation.X = (int)drawLocation.X;
 			drawLocation.Y = (int)drawLocation.Y;
 
 			if (_isBeingHovered)
 				spriteBatch.FillRectangle(drawLocation - Padding, Size, Color.White * 0.05f);
 
-			spriteBatch.Draw(Texture, drawLocation);
+			spriteBatch.FillRectangle(drawLocation, _previewSize, GetPreviewColor());
+		}
+
+		protected virtual Color GetPreviewColor()
+		{
+			return Color.Black;
 		}
 
 		public override void Hover()

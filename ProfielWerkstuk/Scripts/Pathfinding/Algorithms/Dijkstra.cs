@@ -58,7 +58,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.Algorithms
 				List<GridElement> neighbours = smallest.GetNeighbourElements(_gridElements, _allowDiagonal);
 				foreach (GridElement neighbour in neighbours)
 				{ 
-					double distanceTotal = distances[smallest] + smallest.GetDistance(neighbour);
+					double distanceTotal = distances[smallest] + smallest.GetDistance(neighbour) * neighbour.GetTravelCost();
 
 					if (!distances.ContainsKey(neighbour) || distanceTotal < distances[neighbour])
 					{

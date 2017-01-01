@@ -8,7 +8,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 	public class ResultInfo
 	{
 		private readonly ResultInfoType _type;
-		public readonly double Distance;
+		private readonly double _distance;
 		public readonly int X;
 		public readonly int Y;
 		public readonly GridElement PreviousElement;
@@ -16,10 +16,15 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 		public ResultInfo(GridElement element, double distance, ResultInfoType type, GridElement previous)
 		{
 			_type = type;
-			Distance = distance;
+			_distance = distance;
 			X = element.X;
 			Y = element.Y;
 			PreviousElement = previous;
+		}
+
+		public double GetAdjustedDistance()
+		{
+			return _distance/10;
 		}
 
 		public Color GetColor()
@@ -27,9 +32,9 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 			switch (_type)
 			{
 				case ResultInfoType.Frontier:
-					return Color.LightGreen;
+					return new Color(255, 196, 107);
 				case ResultInfoType.Visited:
-					return Color.LightBlue;
+					return new Color(140, 188, 219);
 				default:
 					return Color.Black;
 			}

@@ -3,7 +3,7 @@ using ProfielWerkstuk.Scripts.GridManagement;
 
 namespace ProfielWerkstuk.Scripts.Pathfinding.Algorithms
 {
-	public class BreadthFirstSearch : IAlgorithm
+	public class DepthFirstSearch : IAlgorithm
 	{
 		public AlgorithmType Type { get; set; }
 		private readonly GridElement[,] _gridElements;
@@ -12,9 +12,9 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.Algorithms
 		private readonly GridElement _startElement;
 		private readonly bool _allowDiagonal;
 
-		public BreadthFirstSearch(GridElement[,] gridElements, GridElement start, bool allowDiag)
+		public DepthFirstSearch(GridElement[,] gridElements, GridElement start, bool allowDiag)
 		{
-			Type = AlgorithmType.BreadthFirstSearch;
+			Type = AlgorithmType.DepthFirstSearch;
 			_gridElements = gridElements;
 			_startElement = start;
 			_allowDiagonal = allowDiag;
@@ -35,13 +35,14 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.Algorithms
 
 			while (nodes.Count != 0)
 			{
-				GridElement current = nodes[0];
-				nodes.RemoveAt(0);
-				_resultInfo.Add(new ResultInfo(current, distances[current], ResultInfoType.Visited, 
-					previous.ContainsKey(current) ? previous[current] : null));
+				GridElement current = nodes[nodes.Count-1];
+				nodes.RemoveAt(nodes.Count-1);
 
 				if (current.Type == GridElementType.End)
 				{
+					_resultInfo.Add(new ResultInfo(current, distances[current], ResultInfoType.Visited,
+						previous.ContainsKey(current) ? previous[current] : null));
+
 					while (previous.ContainsKey(current))
 					{
 						_resultPath.Add(current);
@@ -60,8 +61,13 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.Algorithms
 						previous[neighbour] = current;
 						nodes.Add(neighbour);
 						_resultInfo.Add(new ResultInfo(neighbour, distances[current] + 10, ResultInfoType.Frontier, current));
+						if(neighbour.Type == GridElementType.End)
+							break;
 					}
 				}
+
+				_resultInfo.Add(new ResultInfo(current, distances[current], ResultInfoType.Visited,
+					previous.ContainsKey(current) ? previous[current] : null));
 			}
 		}
 
@@ -72,7 +78,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.Algorithms
 
 		public string GetName()
 		{
-			return "Breadth-first search";
+			return "Depth-first search";
 		}
 	}
 }

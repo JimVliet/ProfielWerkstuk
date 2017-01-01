@@ -6,11 +6,12 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 {
 	public class Grid
 	{
-		private ProfielWerkstuk _game;
-		public int GridSize;
-		public int HalfWidth;
-		public int HalfHeight;
-		public float LineWidth;
+		private readonly ProfielWerkstuk _game;
+		private readonly GridPainter _gridPainter;
+		public readonly int GridSize;
+		public readonly int HalfWidth;
+		public readonly int HalfHeight;
+		private readonly float _lineWidth;
 		public RectangleF GridBounds;
 		private readonly GridElement[,] _gridElements;
 		public GridElementType GridHoldType = GridElementType.Null;
@@ -22,10 +23,11 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 		public Grid(ProfielWerkstuk game, int gridSize, int halfWidth, int halfHeight, int lineWidth)
 		{
 			_game = game;
+			_gridPainter = new GridPainter(this, _game.EventHandlers);
 			GridSize = gridSize;
 			HalfWidth = halfWidth;
 			HalfHeight = halfHeight;
-			LineWidth = lineWidth;
+			_lineWidth = lineWidth;
 
 			_gridElements = new GridElement[2 * halfHeight, 2 * halfWidth];
 
@@ -88,16 +90,16 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 			for(int y = -HalfHeight; y <= HalfHeight; y++)
 			{
 				float pixelY = stepRate * y;
-				spriteBatch.DrawLine(new Vector2(-HalfWidth*stepRate - (LineWidth/2), pixelY), 
-					new Vector2(HalfWidth*stepRate + (LineWidth / 2), pixelY), Color.Gray, LineWidth);
+				spriteBatch.DrawLine(new Vector2(-HalfWidth*stepRate - (_lineWidth/2), pixelY), 
+					new Vector2(HalfWidth*stepRate + (_lineWidth / 2), pixelY), Color.Gray, _lineWidth);
 			}
 
 			//Draw horizontal lines
 			for (int x = -HalfWidth; x <= HalfWidth; x++)
 			{
 				float pixelX = stepRate*x;
-				spriteBatch.DrawLine(new Vector2(pixelX, -HalfHeight*stepRate - (LineWidth/2f)),
-					new Vector2(pixelX, HalfHeight*stepRate + (LineWidth/2)), Color.Gray, LineWidth);
+				spriteBatch.DrawLine(new Vector2(pixelX, -HalfHeight*stepRate - (_lineWidth/2f)),
+					new Vector2(pixelX, HalfHeight*stepRate + (_lineWidth/2)), Color.Gray, _lineWidth);
 			}
 		}
 
@@ -115,15 +117,15 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 
 		private float GetStepRate()
 		{
-			return GridSize + LineWidth / 2 + 1;
+			return GridSize + _lineWidth / 2 + 1;
 		}
 
 		public Vector2 GetGridVector2(int x, int y)
 		{
 			float stepRate = GetStepRate();
 
-			float xCoord = stepRate * -HalfWidth + x * stepRate + LineWidth / 2f;
-			float yCoord = stepRate * -HalfHeight + y * stepRate + LineWidth / 2f;
+			float xCoord = stepRate * -HalfWidth + x * stepRate + _lineWidth / 2f;
+			float yCoord = stepRate * -HalfHeight + y * stepRate + _lineWidth / 2f;
 			return new Vector2(xCoord, yCoord);
 		}
 
@@ -142,38 +144,12 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 
 		public void GridClicked(Vector2 clickLocation)
 		{
-			if (AlgorithmActive)
-				return;
-
-			GridElement element = GetGridElement(clickLocation);
-			if (element == null)
-				return;
-			switch (element.Type)
-			{
-				case GridElementType.Empty:
-					element.Type = GridElementType.Solid;
-					break;
-				case GridElementType.Solid:
-					element.Type = GridElementType.Empty;
-					break;
-			}
+			_gridPainter.GridClicked(clickLocation);
 		}
 
 		public void GridHoldClick(Vector2 mouseLocation)
 		{
-			if (AlgorithmActive)
-				return;
-
-			GridElement element = GetGridElement(mouseLocation);
-			if(element == null || element.Type == GridElementType.Start || element.Type == GridElementType.End)
-				return;
-			if (GridHoldType == GridElementType.Null)
-			{
-				GridHoldType = element.Type == GridElementType.Empty ? GridElementType.Solid : GridElementType.Empty;
-				return;
-			}
-
-			element.Type = GridHoldType;
+			_gridPainter.GridHoldClick(mouseLocation);
 		}
 
 		public GridElement[,] GetGridMap()

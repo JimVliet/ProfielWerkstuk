@@ -7,11 +7,6 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 {
 	public class AlgorithmMenu : UserInterfaceMenu
 	{
-		public AlgorithmMenu(BaseUserInterfaceState state, Vector2 pos) : base(state, pos)
-		{
-			SetupMenu();
-		}
-
 		public AlgorithmMenu(BaseUserInterfaceState state) : base(state, HorizontalAlignment.Right, VerticalAlignment.Top)
 		{
 			SetupMenu();
@@ -32,13 +27,23 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 
 			MenuContainer bfsContainer = new MenuContainer(this);
 
-			BfsButton bfs = new BfsButton(bfsContainer, "Breadth first search", State.UiManager.Font16)
+			BfsButton bfs = new BfsButton(bfsContainer, "Breadth-first search", State.UiManager.Font16)
 			{
 				Padding = new Vector2(10, 10)
 			};
 
 			bfs.AddToContainer();
 			bfsContainer.AddToMenu();
+
+			MenuContainer dfsContainer = new MenuContainer(this);
+
+			DfsButton dfs = new DfsButton(dfsContainer, "Depth-first search", State.UiManager.Font16)
+			{
+				Padding = new Vector2(10, 10)
+			};
+
+			dfs.AddToContainer();
+			dfsContainer.AddToMenu();
 		}
 	}
 
@@ -65,6 +70,19 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 		public override void LeftClickEvent()
 		{
 			GetEventHandlers().CalculateBfs?.Invoke();
+		}
+	}
+
+	public class DfsButton : ButtonMenuElement
+	{
+		public DfsButton(MenuContainer parentContainer, string text, SpriteFont font) : base(parentContainer, text, font)
+		{
+
+		}
+
+		public override void LeftClickEvent()
+		{
+			GetEventHandlers().CalculateDfs?.Invoke();
 		}
 	}
 }

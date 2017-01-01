@@ -78,9 +78,11 @@
     <Compile Include="Scripts\Events\InputManager.cs" />
     <Compile Include="Scripts\GridManagement\Grid.cs" />
     <Compile Include="Scripts\GridManagement\GridElement.cs" />
+    <Compile Include="Scripts\GridManagement\GridPainter.cs" />
     <Compile Include="Scripts\GUI\BaseClasses\BaseMenuElement.cs" />
     <Compile Include="Scripts\GUI\BaseClasses\ButtonMenuElement.cs" />
     <Compile Include="Scripts\GUI\BaseClasses\ControlMenuElement.cs" />
+    <Compile Include="Scripts\GUI\BaseClasses\ColoredMenuElement.cs" />
     <Compile Include="Scripts\GUI\BaseClasses\MenuContainer.cs" />
     <Compile Include="Scripts\GUI\BaseClasses\TextMenuElement.cs" />
     <Compile Include="Scripts\GUI\BaseClasses\UserInterfaceMenu.cs" />
@@ -88,6 +90,7 @@
     <Compile Include="Scripts\GUI\Menus\AlgorithmControls.cs" />
     <Compile Include="Scripts\GUI\Menus\AlgorithmMenu.cs" />
     <Compile Include="Scripts\GUI\Menus\EscapeButtonMenu.cs" />
+    <Compile Include="Scripts\GUI\Menus\GridTypePreviewMenu.cs" />
     <Compile Include="Scripts\GUI\Menus\MainMenu.cs" />
     <Compile Include="Scripts\GUI\Menus\OptionMenu.cs" />
     <Compile Include="Scripts\GUI\Menus\ToolTipsMenu.cs" />
@@ -95,12 +98,12 @@
     <Compile Include="Scripts\GUI\States\MainMenuState.cs" />
     <Compile Include="Scripts\GUI\Textures\TextureManager.cs" />
     <Compile Include="Scripts\GUI\UserInterfaceManager.cs" />
-    <Compile Include="Scripts\Pathfinding\AlgorithmDisplayers\BfsDisplayer.cs" />
+    <Compile Include="Scripts\Pathfinding\AlgorithmDisplayers\AlgorithmDisplayer.cs" />
     <Compile Include="Scripts\Pathfinding\AlgorithmDisplayers\DisplayerBase.cs" />
-    <Compile Include="Scripts\Pathfinding\AlgorithmDisplayers\DijkstraDisplayer.cs" />
     <Compile Include="Scripts\GUI\States\GridMapState.cs" />
     <Compile Include="Scripts\Pathfinding\AlgorithmManager.cs" />
     <Compile Include="Scripts\Pathfinding\Algorithms\BreadthFirstSearch.cs" />
+    <Compile Include="Scripts\Pathfinding\Algorithms\DepthFirstSearch.cs" />
     <Compile Include="Scripts\Pathfinding\Algorithms\Dijkstra.cs" />
     <Compile Include="Scripts\Pathfinding\IAlgorithm.cs" />
     <Compile Include="Scripts\Pathfinding\ResultInfo.cs" />

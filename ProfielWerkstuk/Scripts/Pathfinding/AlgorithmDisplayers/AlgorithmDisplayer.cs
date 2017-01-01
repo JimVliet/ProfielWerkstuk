@@ -5,13 +5,13 @@ using ProfielWerkstuk.Scripts.GridManagement;
 
 namespace ProfielWerkstuk.Scripts.Pathfinding.AlgorithmDisplayers
 {
-	public class BfsDisplayer : DisplayerBase
+	public class AlgorithmDisplayer : DisplayerBase
 	{
 		private int _infoAddSpeed = 80;
 		private int _addSpeedMultiplier = 1;
-		private double _updateIndex;
+		private double _updateIndex = -1;
 
-		public BfsDisplayer(ProfielWerkstuk game) : base(game)
+		public AlgorithmDisplayer(ProfielWerkstuk game) : base(game)
 		{
 
 		}
@@ -21,7 +21,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.AlgorithmDisplayers
 			if (ResultInfo == null || (Game.AlgorithmManager.Paused && _addSpeedMultiplier == 1) || Game.AlgorithmManager.DisplayerEndedAnimating)
 				return;
 
-			double newIndex = Math.Min(Math.Max(GetNewIndex(gameTime), 0), ResultInfo.Count - 1);
+			double newIndex = Math.Min(Math.Max(GetNewIndex(gameTime), -1), ResultInfo.Count-1);
 
 			UpdateResults(newIndex);
 
@@ -40,7 +40,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.AlgorithmDisplayers
 			int oldIndex = (int) _updateIndex;
 			int newIndex = (int) newIndexPos;
 
-			if(oldIndex == newIndex || newIndex >= ResultInfo.Count || newIndex < 0)
+			if(oldIndex == newIndex || newIndex >= ResultInfo.Count || newIndex < -1)
 				return;
 
 			GridElement[,] gridMap = Grid.GetGridMap();
@@ -50,7 +50,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.AlgorithmDisplayers
 
 			if (oldIndex < newIndex)
 			{
-				for (int i = oldIndex; i < newIndex; i++)
+				for (int i = oldIndex+1; i <= newIndex; i++)
 				{
 					ResultInfo info = ResultInfo[i];
 
@@ -64,10 +64,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.AlgorithmDisplayers
 				return;
 			}
 
-			if(oldIndex == 0)
-				return;
-
-			for (int i = oldIndex-1; i >= newIndex; i--)
+			for (int i = oldIndex; i > newIndex; i--)
 			{
 				ResultInfo info = ResultInfo[i];
 
@@ -82,7 +79,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.AlgorithmDisplayers
 		{
 			PathDrawingPoints = pathDrawingPoints;
 			ResultInfo = resultInfo;
-			_updateIndex = 0;
+			_updateIndex = -1;
 			Explored = 0;
 		}
 
@@ -111,7 +108,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.AlgorithmDisplayers
 		protected override void SkipToStart()
 		{
 			CleanUp();
-			_updateIndex = 0;
+			_updateIndex = -1;
 			Explored = 0;
 			Game.AlgorithmManager.DisplayerEndedAnimating = false;
 			Game.EventHandlers.PlayPauseEvent?.Invoke(false);

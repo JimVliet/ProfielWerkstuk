@@ -84,9 +84,20 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 				return;
 			}
 
-			spriteBatch.FillRectangle(grid.GetGridVector2(X, Y), new Vector2(grid.GridSize, grid.GridSize), 
-				Type == GridElementType.Empty ? GetResultInfo().GetColor() : GetDrawingColor(dragInfo));
-			if(showArrows)
+			if (Type == GridElementType.Empty)
+			{
+				spriteBatch.FillRectangle(grid.GetGridVector2(X, Y), new Vector2(grid.GridSize, grid.GridSize), GetResultInfo().GetColor());
+			}
+			else
+			{
+				spriteBatch.FillRectangle(grid.GetGridVector2(X, Y), new Vector2(grid.GridSize, grid.GridSize), GetDrawingColor(dragInfo));
+
+				if (Type != GridElementType.Start && Type != GridElementType.End && Type != GridElementType.Solid)
+					spriteBatch.DrawRectangle(grid.GetGridVector2(X, Y), new Vector2(grid.GridSize, grid.GridSize),
+						GetResultInfo().GetColor(), grid.GridSize/16f);
+			}
+
+			if (showArrows)
 				GetResultInfo().DrawArrow(spriteBatch, grid, 40, 10, Color.SaddleBrown);
 		}
 
@@ -139,6 +150,12 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 					return IsDragging(dragInfo) ? new Color(0, 161, 0) : Color.Green;
 				case GridElementType.End:
 					return IsDragging(dragInfo) ? new Color(255, 66, 66) : Color.Red;
+				case GridElementType.Forest:
+					return Color.DarkGreen;
+				case GridElementType.River:
+					return new Color(86, 122, 158);
+				case GridElementType.Road:
+					return Color.RosyBrown;
 			}
 			return Color.Yellow;
 		}
@@ -154,12 +171,12 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 
 			if (allowTop)
 				neighbours.Add(grid[Y - 1, X]);
+			if (allowBottom)
+				neighbours.Add(grid[Y + 1, X]);
 			if (allowLeft)
 				neighbours.Add(grid[Y, X - 1]);
 			if (allowRight)
 				neighbours.Add(grid[Y, X + 1]);
-			if (allowBottom)
-				neighbours.Add(grid[Y + 1, X]);
 
 			if (!allowDiagonal)
 				return neighbours;
@@ -185,10 +202,25 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 		{
 			return x >= 0 && x < grid.GetLength(1) && y >= 0 && y < grid.GetLength(0);
 		}
+
+		public double GetTravelCost()
+		{
+			switch (Type)
+			{
+				case GridElementType.River:
+					return 100;
+				case GridElementType.Forest:
+					return 40;
+				case GridElementType.Road:
+					return 2;
+				default:
+					return 10;
+			}
+		}
 	}
 
 	public enum GridElementType
 	{
-		Empty, Solid, Start, End, Null
+		Empty, Solid, Start, End, Null, Forest, River, Road
 	}
 }
