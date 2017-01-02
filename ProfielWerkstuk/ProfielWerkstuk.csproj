@@ -91,10 +91,12 @@
     <Compile Include="Scripts\GUI\Menus\AlgorithmMenu.cs" />
     <Compile Include="Scripts\GUI\Menus\EscapeButtonMenu.cs" />
     <Compile Include="Scripts\GUI\Menus\GridTypePreviewMenu.cs" />
+    <Compile Include="Scripts\GUI\Menus\KeybindingsMenu.cs" />
     <Compile Include="Scripts\GUI\Menus\MainMenu.cs" />
     <Compile Include="Scripts\GUI\Menus\OptionMenu.cs" />
     <Compile Include="Scripts\GUI\Menus\ToolTipsMenu.cs" />
     <Compile Include="Scripts\GUI\States\BaseUserInterfaceState.cs" />
+    <Compile Include="Scripts\GUI\States\KeybindingsState.cs" />
     <Compile Include="Scripts\GUI\States\MainMenuState.cs" />
     <Compile Include="Scripts\GUI\Textures\TextureManager.cs" />
     <Compile Include="Scripts\GUI\UserInterfaceManager.cs" />
@@ -102,9 +104,11 @@
     <Compile Include="Scripts\Pathfinding\AlgorithmDisplayers\DisplayerBase.cs" />
     <Compile Include="Scripts\GUI\States\GridMapState.cs" />
     <Compile Include="Scripts\Pathfinding\AlgorithmManager.cs" />
+    <Compile Include="Scripts\Pathfinding\Algorithms\AStar.cs" />
     <Compile Include="Scripts\Pathfinding\Algorithms\BreadthFirstSearch.cs" />
     <Compile Include="Scripts\Pathfinding\Algorithms\DepthFirstSearch.cs" />
     <Compile Include="Scripts\Pathfinding\Algorithms\Dijkstra.cs" />
+    <Compile Include="Scripts\Pathfinding\Algorithms\GreedyBfs.cs" />
     <Compile Include="Scripts\Pathfinding\IAlgorithm.cs" />
     <Compile Include="Scripts\Pathfinding\ResultInfo.cs" />
     <Compile Include="Scripts\Utility\Utilities.cs" />

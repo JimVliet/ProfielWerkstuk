@@ -162,6 +162,11 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 			return AlgorithmActive ? null : _startElement;
 		}
 
+		public GridElement GetEndElement()
+		{
+			return AlgorithmActive ? null : _endElement;
+		}
+
 		private void ClearGrid()
 		{
 			foreach (var element in _gridElements)

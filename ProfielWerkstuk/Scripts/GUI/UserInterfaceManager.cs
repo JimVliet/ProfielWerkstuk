@@ -13,8 +13,10 @@ namespace ProfielWerkstuk.Scripts.GUI
 		public SpriteFont Font14;
 		public readonly ProfielWerkstuk Game;
 		private BaseUserInterfaceState _uiState;
+
 		private readonly GridMapState _gridMapState;
 		private readonly MainMenuState _mainMenuState;
+		private readonly KeybindingsState _keybindingsState;
 		private BaseMenuElement _hoverElement;
 
 		public UserInterfaceManager(ProfielWerkstuk game)
@@ -22,20 +24,15 @@ namespace ProfielWerkstuk.Scripts.GUI
 			Game = game;
 			_gridMapState = new GridMapState(game, this);
 			_mainMenuState = new MainMenuState(game, this);
+			_keybindingsState = new KeybindingsState(game, this);
 			SwitchToState(UserInterfaceStates.GridMap);
-
-			Game.EventHandlers.OpenMainMenu += EscapeButtonClick;
-		}
-
-		private void EscapeButtonClick()
-		{
-			SwitchToState(UserInterfaceStates.MainMenu);
 		}
 
 		public void Setup()
 		{
 			_mainMenuState.Setup();
 			_gridMapState.Setup();
+			_keybindingsState.Setup();
 		}
 
 		public void Update(GameTime gameTime)
@@ -107,6 +104,9 @@ namespace ProfielWerkstuk.Scripts.GUI
 				case UserInterfaceStates.MainMenu:
 					_uiState = _mainMenuState;
 					return;
+				case UserInterfaceStates.Keybindings:
+					_uiState = _keybindingsState;
+					return;
 			}
 		}
 
@@ -119,6 +119,9 @@ namespace ProfielWerkstuk.Scripts.GUI
 					return;
 				case UserInterfaceStates.MainMenu:
 					_uiState = _gridMapState;
+					return;
+				case UserInterfaceStates.Keybindings:
+					_uiState = _mainMenuState;
 					return;
 			}
 		}

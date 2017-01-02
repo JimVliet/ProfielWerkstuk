@@ -208,13 +208,13 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 			switch (Type)
 			{
 				case GridElementType.River:
-					return 100;
+					return 50;
 				case GridElementType.Forest:
-					return 40;
+					return 20;
 				case GridElementType.Road:
-					return 2;
+					return 1;
 				default:
-					return 10;
+					return 5;
 			}
 		}
 	}

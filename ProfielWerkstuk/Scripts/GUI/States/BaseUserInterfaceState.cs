@@ -56,6 +56,6 @@ namespace ProfielWerkstuk.Scripts.GUI.States
 
 	public enum UserInterfaceStates
 	{
-		GridMap, MainMenu
+		GridMap, MainMenu, Keybindings
 	}
 }

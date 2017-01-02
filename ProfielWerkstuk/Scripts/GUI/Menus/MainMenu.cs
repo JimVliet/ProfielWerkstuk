@@ -33,6 +33,15 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 			clearGridButton.AddToContainer();
 			containerClearGrid.AddToMenu();
 
+			MenuContainer keybindingContainer = new MenuContainer(this);
+			KeybindingsButton keybindings = new KeybindingsButton(keybindingContainer, "Keybindings", State.UiManager.Font24)
+			{
+				Padding = new Vector2(20, 10)
+			};
+
+			keybindings.AddToContainer();
+			keybindingContainer.AddToMenu();
+
 			MenuContainer containerBack = new MenuContainer(this);
 			BackButton back = new BackButton(containerBack, "Back", State.UiManager.Font24)
 			{
@@ -80,6 +89,19 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 		public override void LeftClickEvent()
 		{
 			GetEventHandlers().ClearGridClicked?.Invoke();
+		}
+	}
+
+	internal class KeybindingsButton : ButtonMenuElement
+	{
+		public KeybindingsButton(MenuContainer parentContainer, string text, SpriteFont font) : base(parentContainer, text, font)
+		{
+
+		}
+
+		public override void LeftClickEvent()
+		{
+			GetEventHandlers().OpenKeybindings?.Invoke();
 		}
 	}
 }

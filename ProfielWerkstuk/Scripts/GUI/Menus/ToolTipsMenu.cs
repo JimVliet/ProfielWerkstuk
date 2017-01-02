@@ -17,23 +17,22 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 
 		private void SetupTextElements()
 		{
-			Margin = new Vector2(10, 10);
 			BaseButtonDistance = 0;
 
 			MenuContainer menuContainer = new MenuContainer(this);
-			DistanceInfo distanceInfo = new DistanceInfo(menuContainer, new Vector2(-110, -39), 
+			ResultInfoTextElement resultInfoTextElement = new ResultInfoTextElement(menuContainer, new Vector2(-130, -39), 
 				"Distance to start: -", State.UiManager.Font14);
-			distanceInfo.AddToContainer();
+			resultInfoTextElement.AddToContainer();
 
-			PosInfo posInfo = new PosInfo(menuContainer, new Vector2(-110, -13),
+			PosInfo posInfo = new PosInfo(menuContainer, new Vector2(-130, -13),
 				"Position: -", State.UiManager.Font14);
 			posInfo.AddToContainer();
 
 			NodesExploredInfo nodesExplored = new NodesExploredInfo(menuContainer, 
-				new Vector2(-110, 13), "Nodes explored: -", State.UiManager.Font14);
+				new Vector2(-130, 13), "Nodes explored: -", State.UiManager.Font14);
 			nodesExplored.AddToContainer();
 
-			PercentExploredInfo percentExplored = new PercentExploredInfo(menuContainer, new Vector2(-110, 39), 
+			PercentExploredInfo percentExplored = new PercentExploredInfo(menuContainer, new Vector2(-130, 39), 
 				"Nodes explored: -", State.UiManager.Font14, State.Game.Grid);
 			percentExplored.AddToContainer();
 			
@@ -41,9 +40,9 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 		}
 	}
 
-	internal class DistanceInfo : TextMenuElement
+	internal class ResultInfoTextElement : TextMenuElement
 	{
-		public DistanceInfo(MenuContainer parentContainer, Vector2 offset, string text, SpriteFont font) : base(parentContainer, offset, text, font)
+		public ResultInfoTextElement(MenuContainer parentContainer, Vector2 offset, string text, SpriteFont font) : base(parentContainer, offset, text, font)
 		{
 			GetEventHandlers().TextUpdate += UpdateDistance;
 			Alignment = TextAlignment.Left;
@@ -51,8 +50,7 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 
 		private void UpdateDistance(GridElement element, int explored)
 		{
-			Text = "Distance to start: " + (element?.GetResultInfo() == null ? "-"
-					: Math.Round(element.GetResultInfo().GetAdjustedDistance(), 2).ToString(CultureInfo.CurrentCulture));
+			Text = element?.GetResultInfo() == null ? "-" : element.GetResultInfo().GetInfoText();
 		}
 	}
 

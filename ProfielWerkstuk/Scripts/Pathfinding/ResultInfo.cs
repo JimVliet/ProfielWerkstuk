@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.Globalization;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Shapes;
 using ProfielWerkstuk.Scripts.GridManagement;
@@ -8,23 +10,43 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 	public class ResultInfo
 	{
 		private readonly ResultInfoType _type;
-		private readonly double _distance;
 		public readonly int X;
 		public readonly int Y;
 		public readonly GridElement PreviousElement;
+		private readonly string _text;
 
-		public ResultInfo(GridElement element, double distance, ResultInfoType type, GridElement previous)
+		public ResultInfo(GridElement element, double number, ResultInfoType type, GridElement previous, bool numberIsHeuristic)
 		{
 			_type = type;
-			_distance = distance;
 			X = element.X;
 			Y = element.Y;
 			PreviousElement = previous;
+
+			if (numberIsHeuristic)
+				_text = "Heuristic: " + RoundDoubleToString(number);
+			else
+				_text = "Distance to start: " + RoundDoubleToString(number);
 		}
 
-		public double GetAdjustedDistance()
+		public ResultInfo(GridElement element, double distanceSoFar, double heuristic, ResultInfoType type, GridElement previous)
 		{
-			return _distance/10;
+			_type = type;
+			X = element.X;
+			Y = element.Y;
+			PreviousElement = previous;
+
+			_text = "F = " + RoundDoubleToString(distanceSoFar + heuristic) + " = (G) " + 
+				RoundDoubleToString(distanceSoFar) + " + (H) " + RoundDoubleToString(heuristic);
+		}
+
+		public string GetInfoText()
+		{
+			return _text;
+		}
+
+		private string RoundDoubleToString(double number)
+		{
+			return Math.Round(number, 2).ToString(CultureInfo.CurrentCulture);
 		}
 
 		public Color GetColor()
@@ -107,17 +129,6 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 		private void DrawArrowLine(SpriteBatch spriteBatch, Vector2 center, Vector2 deltaLine, Color color)
 		{
 			spriteBatch.DrawLine(center - deltaLine, center + deltaLine, color, 4f);
-		}
-
-		public double GetExtraDistance()
-		{
-			switch (_type)
-			{
-				case ResultInfoType.Frontier:
-					return 1d;
-				default:
-					return 0d;
-			}
 		}
 
 		private bool HasPrevious()

@@ -65,6 +65,8 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 			GetEventHandlers().CalculateDijkstra += CalculateDijkstra;
 			GetEventHandlers().CalculateBfs += CalculateBfs;
 			GetEventHandlers().CalculateDfs += CalculateDfs;
+			GetEventHandlers().CalculateGreedyBfs += CalculateGreedyBfs;
+			GetEventHandlers().CalculateAStar += CalculateAStar;
 
 			GetEventHandlers().DiagonalButtonClicked += DiagonalButtonClicked;
 			GetEventHandlers().PlayPauseButtonClicked += PlayPauseButtonClicked;
@@ -86,40 +88,29 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 			switch (type)
 			{
 				case AlgorithmType.Dijkstra:
-					//if (_currentAlgorithm == null || _currentAlgorithm.Type != AlgorithmType.Dijkstra)
-					//{
-					//	Displayer?.Dispose();
-					//	Displayer = new AlgorithmDisplayer(_game);
-					//}
-					
 					_currentAlgorithm = new Dijkstra(_game.Grid.GetGridMap(), _game.Grid.GetStartElement(), _allowDiagonal);
 					_algorithmThread = new Thread(_currentAlgorithm.CalculatePath);
 					break;
 				case AlgorithmType.BreadthFirstSearch:
-					//if (_currentAlgorithm == null || _currentAlgorithm.Type != AlgorithmType.BreadthFirstSearch)
-					//{
-					//	Displayer?.Dispose();
-					//	Displayer = new AlgorithmDisplayer(_game);
-					//}
-
 					_currentAlgorithm = new BreadthFirstSearch(_game.Grid.GetGridMap(), _game.Grid.GetStartElement(), _allowDiagonal);
 					_algorithmThread = new Thread(_currentAlgorithm.CalculatePath);
 					break;
 				case AlgorithmType.DepthFirstSearch:
-					//if (_currentAlgorithm == null || _currentAlgorithm.Type != AlgorithmType.DepthFirstSearch)
-					//{
-					//	Displayer?.Dispose();
-					//	Displayer = new AlgorithmDisplayer(_game);
-					//}
-
 					_currentAlgorithm = new DepthFirstSearch(_game.Grid.GetGridMap(), _game.Grid.GetStartElement(), _allowDiagonal);
+					_algorithmThread = new Thread(_currentAlgorithm.CalculatePath);
+					break;
+				case AlgorithmType.GreedyBestFirstSearch:
+					_currentAlgorithm = new GreedyBfs(_game.Grid.GetGridMap(), _game.Grid.GetStartElement(), _game.Grid.GetEndElement(), _allowDiagonal);
+					_algorithmThread = new Thread(_currentAlgorithm.CalculatePath);
+					break;
+				case AlgorithmType.AStar:
+					_currentAlgorithm = new AStar(_game.Grid.GetGridMap(), _game.Grid.GetStartElement(), _game.Grid.GetEndElement(), _allowDiagonal);
 					_algorithmThread = new Thread(_currentAlgorithm.CalculatePath);
 					break;
 				default:
 					return;
 			}
 			
-
 			IsCalculating = true;
 			_algorithmThread.Start();
 		}
@@ -223,10 +214,20 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 		{
 			Calculate(AlgorithmType.DepthFirstSearch);
 		}
+
+		private void CalculateGreedyBfs()
+		{
+			Calculate(AlgorithmType.GreedyBestFirstSearch);
+		}
+
+		private void CalculateAStar()
+		{
+			Calculate(AlgorithmType.AStar);
+		}
 	}
 
 	public enum AlgorithmType
 	{
-		Dijkstra, AStar, BreadthFirstSearch, DepthFirstSearch
+		Dijkstra, AStar, BreadthFirstSearch, DepthFirstSearch, GreedyBestFirstSearch
 	}
 }

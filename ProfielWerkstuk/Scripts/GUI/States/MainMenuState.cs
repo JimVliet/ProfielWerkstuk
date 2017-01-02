@@ -9,6 +9,7 @@ namespace ProfielWerkstuk.Scripts.GUI.States
 			AllowClicking = false;
 			Game.EventHandlers.BackButtonClicked += BackButtonClick;
 			Game.EventHandlers.ExitButtonClicked += ExitButtonClick;
+			Game.EventHandlers.OpenMainMenu += EscapeButtonClick;
 		}
 
 		public override void Setup()
@@ -19,12 +20,17 @@ namespace ProfielWerkstuk.Scripts.GUI.States
 
 		private void BackButtonClick()
 		{
-			Game.UserInterface.SwitchToState(UserInterfaceStates.GridMap);
+			UiManager.SwitchToState(UserInterfaceStates.GridMap);
 		}
 
 		private void ExitButtonClick()
 		{
 			Game.Exit();
+		}
+
+		private void EscapeButtonClick()
+		{
+			UiManager.SwitchToState(UserInterfaceStates.MainMenu);
 		}
 	}
 }

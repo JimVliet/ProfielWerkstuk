@@ -4,21 +4,23 @@ using ProfielWerkstuk.Scripts.GridManagement;
 
 namespace ProfielWerkstuk.Scripts.Pathfinding.Algorithms
 {
-	public class Dijkstra : IAlgorithm
+	public class GreedyBfs : IAlgorithm
 	{
 		private readonly GridElement[,] _gridElements;
 		private readonly List<GridElement> _resultPath = new List<GridElement>();
 		private readonly List<ResultInfo> _resultInfo = new List<ResultInfo>();
 		private readonly GridElement _startElement;
+		private readonly GridElement _endElement;
 		private readonly bool _allowDiagonal;
 		public AlgorithmType Type { get; set; }
 
-		public Dijkstra(GridElement[,] gridElements, GridElement start, bool allowDiag)
+		public GreedyBfs(GridElement[,] gridElements, GridElement start, GridElement end, bool allowDiag)
 		{
 			_gridElements = gridElements;
 			_startElement = start;
+			_endElement = end;
 			_allowDiagonal = allowDiag;
-			Type = AlgorithmType.Dijkstra;
+			Type = AlgorithmType.GreedyBestFirstSearch;
 		}
 
 		public void CalculatePath()
@@ -26,7 +28,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.Algorithms
 			Dictionary<GridElement, GridElement> previous = new Dictionary<GridElement, GridElement>();
 			Dictionary<GridElement, double> distances = new Dictionary<GridElement, double>
 			{
-				[_startElement] = 0
+				[_startElement] = _startElement.GetDistance(_endElement)
 			};
 
 			List<GridElement> nodes = new List<GridElement>
@@ -36,36 +38,35 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.Algorithms
 
 			while (nodes.Count != 0)
 			{
-				//sorteer de nodesList
 				nodes = nodes.OrderBy(x => distances[x]).ToList();
 
-				GridElement smallest = nodes[0];
+				GridElement closestElement = nodes[0];
 				nodes.RemoveAt(0);
-				_resultInfo.Add(new ResultInfo(smallest, distances[smallest], ResultInfoType.Visited, 
-					previous.ContainsKey(smallest) ? previous[smallest] : null, false));
+				_resultInfo.Add(new ResultInfo(closestElement, distances[closestElement], ResultInfoType.Visited,
+					previous.ContainsKey(closestElement) ? previous[closestElement] : null, true));
 
-				if (smallest.Type == GridElementType.End)
+				if (closestElement.Type == GridElementType.End)
 				{
-					while (previous.ContainsKey(smallest))
+					while (previous.ContainsKey(closestElement))
 					{
-						_resultPath.Add(smallest);
-						smallest = previous[smallest];
+						_resultPath.Add(closestElement);
+						closestElement = previous[closestElement];
 					}
 					_resultPath.Add(_startElement);
 					break;
 				}
 
-				List<GridElement> neighbours = smallest.GetNeighbourElements(_gridElements, _allowDiagonal);
+				List<GridElement> neighbours = closestElement.GetNeighbourElements(_gridElements, _allowDiagonal);
 				foreach (GridElement neighbour in neighbours)
-				{ 
-					double distanceTotal = distances[smallest] + smallest.GetDistance(neighbour) * neighbour.GetTravelCost();
-
-					if (!distances.ContainsKey(neighbour) || distanceTotal < distances[neighbour])
+				{
+					if (!distances.ContainsKey(neighbour))
 					{
+						double distanceTotal = neighbour.GetDistance(_endElement)*5;
+
 						distances[neighbour] = distanceTotal;
-						previous[neighbour] = smallest;
+						previous[neighbour] = closestElement;
 						nodes.Add(neighbour);
-						_resultInfo.Add(new ResultInfo(neighbour, distanceTotal, ResultInfoType.Frontier, smallest, false));
+						_resultInfo.Add(new ResultInfo(neighbour, distanceTotal, ResultInfoType.Frontier, closestElement, true));
 					}
 				}
 			}
@@ -78,8 +79,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.Algorithms
 
 		public string GetName()
 		{
-			return "Dijkstra";
+			return "Greedy best-first search";
 		}
 	}
 }
-  

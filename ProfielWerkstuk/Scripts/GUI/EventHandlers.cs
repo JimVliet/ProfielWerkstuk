@@ -7,6 +7,9 @@ namespace ProfielWerkstuk.Scripts.GUI
 		public ButtonClicked CalculateDijkstra;
 		public ButtonClicked CalculateBfs;
 		public ButtonClicked CalculateDfs;
+		public ButtonClicked CalculateGreedyBfs;
+		public ButtonClicked CalculateAStar;
+
 		public ButtonClicked OpenMainMenu;
 		public ButtonClicked DiagonalButtonClicked;
 		public ButtonClicked PlayPauseButtonClicked;
@@ -21,6 +24,8 @@ namespace ProfielWerkstuk.Scripts.GUI
 		public ButtonClicked ShowArrowsClicked;
 		public ButtonClicked ClearGridClicked;
 		public ButtonClicked GridPreviewClicked;
+		public ButtonClicked BackToMainMenuClicked;
+		public ButtonClicked OpenKeybindings;
 
 		public TextUpdate TextUpdate;
 		public CalculateAlgorithm CalculateAlgorithm;

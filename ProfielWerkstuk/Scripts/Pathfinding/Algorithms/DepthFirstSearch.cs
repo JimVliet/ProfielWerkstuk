@@ -37,12 +37,11 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.Algorithms
 			{
 				GridElement current = nodes[nodes.Count-1];
 				nodes.RemoveAt(nodes.Count-1);
+				_resultInfo.Add(new ResultInfo(current, distances[current], ResultInfoType.Visited,
+						previous.ContainsKey(current) ? previous[current] : null, false));
 
 				if (current.Type == GridElementType.End)
 				{
-					_resultInfo.Add(new ResultInfo(current, distances[current], ResultInfoType.Visited,
-						previous.ContainsKey(current) ? previous[current] : null));
-
 					while (previous.ContainsKey(current))
 					{
 						_resultPath.Add(current);
@@ -57,17 +56,14 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.Algorithms
 				{
 					if (!distances.ContainsKey(neighbour))
 					{
-						distances[neighbour] = distances[current] + 10;
+						distances[neighbour] = distances[current] + 5;
 						previous[neighbour] = current;
 						nodes.Add(neighbour);
-						_resultInfo.Add(new ResultInfo(neighbour, distances[current] + 10, ResultInfoType.Frontier, current));
+						_resultInfo.Add(new ResultInfo(neighbour, distances[current] + 5, ResultInfoType.Frontier, current, false));
 						if(neighbour.Type == GridElementType.End)
 							break;
 					}
 				}
-
-				_resultInfo.Add(new ResultInfo(current, distances[current], ResultInfoType.Visited,
-					previous.ContainsKey(current) ? previous[current] : null));
 			}
 		}
 
