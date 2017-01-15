@@ -15,6 +15,15 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.AlgorithmDisplayers
 
 		protected int Explored;
 
+		public virtual void ResetDisplayer()
+		{
+			ResultInfo = null;
+			PathDrawingPoints = null;
+
+			Game.AlgorithmManager.DisplayerEndedAnimating = true;
+			Game.EventHandlers.PlayPauseEvent?.Invoke(true);
+		}
+
 		protected DisplayerBase(ProfielWerkstuk game)
 		{
 			Grid = game.Grid;

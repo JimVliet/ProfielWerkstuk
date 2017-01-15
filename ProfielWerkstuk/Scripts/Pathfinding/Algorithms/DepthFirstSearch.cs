@@ -56,10 +56,10 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.Algorithms
 				{
 					if (!distances.ContainsKey(neighbour))
 					{
-						distances[neighbour] = distances[current] + 5;
+						distances[neighbour] = distances[current] + 1;
 						previous[neighbour] = current;
 						nodes.Add(neighbour);
-						_resultInfo.Add(new ResultInfo(neighbour, distances[current] + 5, ResultInfoType.Frontier, current, false));
+						_resultInfo.Add(new ResultInfo(neighbour, distances[neighbour], ResultInfoType.Frontier, current, false));
 						if(neighbour.Type == GridElementType.End)
 							break;
 					}

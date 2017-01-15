@@ -120,5 +120,14 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.AlgorithmDisplayers
 			_updateIndex = ResultInfo.Count - 1;
 			Game.AlgorithmManager.DisplayerEndedAnimating = true;
 		}
+
+		public override void ResetDisplayer()
+		{
+			base.ResetDisplayer();
+
+			CleanUp();
+			_updateIndex = -1;
+			Explored = 0;
+		}
 	}
 }

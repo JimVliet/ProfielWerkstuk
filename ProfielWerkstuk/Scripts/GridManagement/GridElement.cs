@@ -66,7 +66,7 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 			return dragInfo.DragElement?.X == X && dragInfo.DragElement.Y == Y;
 		}
 
-		public void Draw(SpriteBatch spriteBatch, Grid grid, DraggingInfo dragInfo, bool showArrows)
+		public void Draw(SpriteBatch spriteBatch, Grid grid, DraggingInfo dragInfo, bool showArrows, bool showInfo, SpriteFont font)
 		{
 			if (dragInfo.DragElement != null && Type != GridElementType.Start && Type != GridElementType.End && IsBeingDraggedOver(dragInfo))
 			{
@@ -93,12 +93,25 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 				spriteBatch.FillRectangle(grid.GetGridVector2(X, Y), new Vector2(grid.GridSize, grid.GridSize), GetDrawingColor(dragInfo));
 
 				if (Type != GridElementType.Start && Type != GridElementType.End && Type != GridElementType.Solid)
+				{
 					spriteBatch.DrawRectangle(grid.GetGridVector2(X, Y), new Vector2(grid.GridSize, grid.GridSize),
 						GetResultInfo().GetColor(), grid.GridSize/16f);
+				}
 			}
 
 			if (showArrows)
 				GetResultInfo().DrawArrow(spriteBatch, grid, 40, 10, Color.SaddleBrown);
+			if(showInfo)
+				DrawTextInfo(spriteBatch, grid, font);
+		}
+
+		private void DrawTextInfo(SpriteBatch spriteBatch, Grid grid, SpriteFont font)
+		{
+			Vector2 drawPos = grid.GetGridVector2(X, Y) + new Vector2(grid.GridSize / 2f) - font.MeasureString(GetResultInfo().GetStringForDisplay()) / 2f;
+			drawPos.X = (int)drawPos.X;
+			drawPos.Y = (int)drawPos.Y;
+
+			spriteBatch.DrawString(font, GetResultInfo().GetStringForDisplay(), drawPos, Color.Black);
 		}
 
 		private void DrawDragElement(SpriteBatch spriteBatch, Grid grid, GridElement dragElement)
@@ -154,8 +167,8 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 					return Color.DarkGreen;
 				case GridElementType.River:
 					return new Color(86, 122, 158);
-				case GridElementType.Road:
-					return Color.RosyBrown;
+				case GridElementType.Mountain:
+					return new Color(212, 143, 121);
 			}
 			return Color.Yellow;
 		}
@@ -208,19 +221,19 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 			switch (Type)
 			{
 				case GridElementType.River:
-					return 50;
+					return 8;
 				case GridElementType.Forest:
-					return 20;
-				case GridElementType.Road:
-					return 1;
+					return 3;
+				case GridElementType.Mountain:
+					return 12;
 				default:
-					return 5;
+					return 1;
 			}
 		}
 	}
 
 	public enum GridElementType
 	{
-		Empty, Solid, Start, End, Null, Forest, River, Road
+		Empty, Solid, Start, End, Null, Forest, River, Mountain
 	}
 }

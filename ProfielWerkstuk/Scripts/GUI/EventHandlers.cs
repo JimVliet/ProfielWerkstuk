@@ -1,4 +1,5 @@
-﻿using ProfielWerkstuk.Scripts.GridManagement;
+﻿using System.Windows.Forms;
+using ProfielWerkstuk.Scripts.GridManagement;
 
 namespace ProfielWerkstuk.Scripts.GUI
 {
@@ -26,15 +27,20 @@ namespace ProfielWerkstuk.Scripts.GUI
 		public ButtonClicked GridPreviewClicked;
 		public ButtonClicked BackToMainMenuClicked;
 		public ButtonClicked OpenKeybindings;
+		public ButtonClicked ChangeMapSizeClicked;
 
 		public TextUpdate TextUpdate;
 		public CalculateAlgorithm CalculateAlgorithm;
 		public ChangeDiagonalOption ChangeDiagonalOption;
 		public PlayPauseEvent PlayPauseEvent;
 		public ShowArrows ShowArrows;
+		public ShowInfoText ShowInfoText;
 		public GetPreviewType GetPreviewType;
 		public PreviewTypeSwitched PreviewTypeSwitched;
 		public ShiftHeld ShiftHeld;
+		public GenerateMaze GenerateMaze;
+		public ResetDisplayer ResetDisplayer;
+		public MapSizeChanged MapsizeChanged;
 	}
 	public delegate void TextUpdate(GridElement element, int explored);
 
@@ -48,7 +54,15 @@ namespace ProfielWerkstuk.Scripts.GUI
 
 	public delegate void PreviewTypeSwitched();
 
+	public delegate void GenerateMaze();
+
+	public delegate void ResetDisplayer();
+
 	public delegate void ShowArrows(bool showArrows);
+
+	public delegate void ShowInfoText(bool showText);
+
+	public delegate void MapSizeChanged(MapSize mapSize);
 
 	public delegate GridElementType GetPreviewType();
 

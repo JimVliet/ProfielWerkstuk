@@ -104,3 +104,9 @@
 /processorParam:TextureFormat=NoChange
 /build:Raleway14.spritefont
 
+#begin RalewayBold16.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=NoChange
+/build:RalewayBold16.spritefont
+

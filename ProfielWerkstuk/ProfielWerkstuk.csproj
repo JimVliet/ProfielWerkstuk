@@ -79,6 +79,8 @@
     <Compile Include="Scripts\GridManagement\Grid.cs" />
     <Compile Include="Scripts\GridManagement\GridElement.cs" />
     <Compile Include="Scripts\GridManagement\GridPainter.cs" />
+    <Compile Include="Scripts\GridManagement\MapGeneration.cs" />
+    <Compile Include="Scripts\GridManagement\MazeGenerator.cs" />
     <Compile Include="Scripts\GUI\BaseClasses\BaseMenuElement.cs" />
     <Compile Include="Scripts\GUI\BaseClasses\ButtonMenuElement.cs" />
     <Compile Include="Scripts\GUI\BaseClasses\ControlMenuElement.cs" />

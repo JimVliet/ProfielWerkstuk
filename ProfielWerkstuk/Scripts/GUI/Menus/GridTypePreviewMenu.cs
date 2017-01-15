@@ -19,7 +19,7 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 
 			PreviewName previewName = new PreviewName(container, new Vector2(), "Solid", State.UiManager.Font14)
 			{
-				Padding = new Vector2(10),
+				Padding = new Vector2(20, 10),
 				Offset = new Vector2(-35, 0)
 			};
 			previewName.AddToContainer();
@@ -27,7 +27,7 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 			GridPreview preview = new GridPreview(container, new Vector2(32, 32))
 			{
 				Padding = new Vector2(10),
-				Offset = new Vector2(35, 0)
+				Offset = new Vector2(38, 0)
 			};
 
 			preview.AddToContainer();
@@ -59,8 +59,8 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 					return Color.DarkGreen;
 				case GridElementType.River:
 					return new Color(86, 122, 158);
-				case GridElementType.Road:
-					return Color.RosyBrown;
+				case GridElementType.Mountain:
+					return new Color(212, 143, 121);
 				default:
 					return Color.Black;
 			}

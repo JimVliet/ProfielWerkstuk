@@ -61,7 +61,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding.Algorithms
 				{
 					if (!distances.ContainsKey(neighbour))
 					{
-						double distanceTotal = neighbour.GetDistance(_endElement)*5;
+						double distanceTotal = neighbour.GetDistance(_endElement);
 
 						distances[neighbour] = distanceTotal;
 						previous[neighbour] = closestElement;

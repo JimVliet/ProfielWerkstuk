@@ -20,19 +20,19 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 			BaseButtonDistance = 0;
 
 			MenuContainer menuContainer = new MenuContainer(this);
-			ResultInfoTextElement resultInfoTextElement = new ResultInfoTextElement(menuContainer, new Vector2(-130, -39), 
+			ResultInfoTextElement resultInfoTextElement = new ResultInfoTextElement(menuContainer, new Vector2(-140, -39), 
 				"Distance to start: -", State.UiManager.Font14);
 			resultInfoTextElement.AddToContainer();
 
-			PosInfo posInfo = new PosInfo(menuContainer, new Vector2(-130, -13),
+			PosInfo posInfo = new PosInfo(menuContainer, new Vector2(-140, -13),
 				"Position: -", State.UiManager.Font14);
 			posInfo.AddToContainer();
 
 			NodesExploredInfo nodesExplored = new NodesExploredInfo(menuContainer, 
-				new Vector2(-130, 13), "Nodes explored: -", State.UiManager.Font14);
+				new Vector2(-140, 13), "Nodes explored: -", State.UiManager.Font14);
 			nodesExplored.AddToContainer();
 
-			PercentExploredInfo percentExplored = new PercentExploredInfo(menuContainer, new Vector2(-130, 39), 
+			PercentExploredInfo percentExplored = new PercentExploredInfo(menuContainer, new Vector2(-140, 39), 
 				"Nodes explored: -", State.UiManager.Font14, State.Game.Grid);
 			percentExplored.AddToContainer();
 			
@@ -102,7 +102,7 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 
 		private int GetGridArea()
 		{
-			return _grid.HalfWidth*_grid.HalfHeight*4;
+			return _grid.Width*_grid.Height;
 		}
 	}
 }

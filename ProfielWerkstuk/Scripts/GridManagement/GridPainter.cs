@@ -17,7 +17,7 @@ namespace ProfielWerkstuk.Scripts.GridManagement
 			_grid = grid;
 			_gridTypes = new List<GridElementType>
 			{
-				GridElementType.Solid, GridElementType.Road, GridElementType.Forest, GridElementType.River
+				GridElementType.Solid, GridElementType.Mountain, GridElementType.Forest, GridElementType.River
 			};
 
 			_type = _gridTypes[_index];

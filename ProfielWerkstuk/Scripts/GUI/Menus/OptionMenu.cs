@@ -27,7 +27,7 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 			{
 				Padding = new Vector2(10)
 			};
-			ShowArrowsButton showArrowsButton = new ShowArrowsButton(buttonContainer, "Show arrows", State.UiManager.Font14)
+			ShowArrowsButton showArrowsButton = new ShowArrowsButton(buttonContainer, "Show neither", State.UiManager.Font14)
 			{
 				Padding = new Vector2(10)
 			};
@@ -96,6 +96,7 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 			ButtonHoverColor = new Color(255, 30, 30);
 			MatchToContainer = false;
 			GetEventHandlers().ShowArrows += ShowArrowsOptionChanged;
+			GetEventHandlers().ShowInfoText += ShowInfoTextOptionChanged;
 		}
 
 		public override void LeftClickEvent()
@@ -103,15 +104,32 @@ namespace ProfielWerkstuk.Scripts.GUI.Menus
 			GetEventHandlers().ShowArrowsClicked?.Invoke();
 		}
 
-		private void ShowArrowsOptionChanged(bool diagonal)
+		private void ShowArrowsOptionChanged(bool showArrows)
 		{
-			if (diagonal)
+			if (showArrows)
 			{
+				Text = "Show arrows";
 				ButtonColor = Color.Green;
 				ButtonHoverColor = new Color(40, 128, 40);
 				return;
 			}
 
+			Text = "Show neither";
+			ButtonColor = Color.Red;
+			ButtonHoverColor = new Color(255, 30, 30);
+		}
+
+		private void ShowInfoTextOptionChanged(bool showText)
+		{
+			if (showText)
+			{
+				Text = "Show info";
+				ButtonColor = Color.Green;
+				ButtonHoverColor = new Color(40, 128, 40);
+				return;
+			}
+
+			Text = "Show neither";
 			ButtonColor = Color.Red;
 			ButtonHoverColor = new Color(255, 30, 30);
 		}

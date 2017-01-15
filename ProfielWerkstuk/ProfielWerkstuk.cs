@@ -57,8 +57,7 @@ namespace ProfielWerkstuk
 		protected override void Initialize()
 		{
 			IsMouseVisible = true;
-			Grid = new Grid(this, 64, 30, 20, 2);
-			Grid.GenerateGrid();
+			Grid = new Grid(this, 64, MapSize.Medium, 2);
 
 			base.Initialize();
 
@@ -90,6 +89,7 @@ namespace ProfielWerkstuk
 			UserInterface.Font24 = Content.Load<SpriteFont>("Raleway24");
 			UserInterface.Font16 = Content.Load<SpriteFont>("Raleway16");
 			UserInterface.Font14 = Content.Load<SpriteFont>("Raleway14");
+			UserInterface.BoldFont16 = Content.Load<SpriteFont>("RalewayBold16");
 
 			//Load controlMenu textures
 			TextureManager.Play = Content.Load<Texture2D>("Play");
@@ -138,7 +138,7 @@ namespace ProfielWerkstuk
 		{
 			GraphicsDevice.Clear(Color.WhiteSmoke);
 
-			_spriteBatch.Begin(transformMatrix: CameraManager.Camera.GetViewMatrix());
+			_spriteBatch.Begin(transformMatrix: CameraManager.Camera.GetViewMatrix(), samplerState: SamplerState.AnisotropicWrap);
 			Grid.DrawGridLines(_spriteBatch);
 			Grid.DrawGridSquares(_spriteBatch);
 			AlgorithmManager.Draw(_spriteBatch);

@@ -14,6 +14,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 		public readonly int Y;
 		public readonly GridElement PreviousElement;
 		private readonly string _text;
+		private readonly string _infoText;
 
 		public ResultInfo(GridElement element, double number, ResultInfoType type, GridElement previous, bool numberIsHeuristic)
 		{
@@ -23,9 +24,11 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 			PreviousElement = previous;
 
 			if (numberIsHeuristic)
-				_text = "Heuristic: " + RoundDoubleToString(number);
+				_text = "Heuristic: " + RoundDoubleToString(number, 2);
 			else
-				_text = "Distance to start: " + RoundDoubleToString(number);
+				_text = "Distance to start: " + RoundDoubleToString(number, 2);
+
+			_infoText = RoundDoubleToString(number, 1);
 		}
 
 		public ResultInfo(GridElement element, double distanceSoFar, double heuristic, ResultInfoType type, GridElement previous)
@@ -35,8 +38,9 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 			Y = element.Y;
 			PreviousElement = previous;
 
-			_text = "F = " + RoundDoubleToString(distanceSoFar + heuristic) + " = (G) " + 
-				RoundDoubleToString(distanceSoFar) + " + (H) " + RoundDoubleToString(heuristic);
+			_text = "F = " + RoundDoubleToString(distanceSoFar + heuristic, 2) + " = (G) " + 
+				RoundDoubleToString(distanceSoFar, 2) + " + (H) " + RoundDoubleToString(heuristic, 2);
+			_infoText = RoundDoubleToString(distanceSoFar + heuristic, 1);
 		}
 
 		public string GetInfoText()
@@ -44,9 +48,14 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 			return _text;
 		}
 
-		private string RoundDoubleToString(double number)
+		public string GetStringForDisplay()
 		{
-			return Math.Round(number, 2).ToString(CultureInfo.CurrentCulture);
+			return _infoText;
+		}
+
+		private string RoundDoubleToString(double number, int decimals)
+		{
+			return Math.Round(number, decimals).ToString(CultureInfo.CurrentCulture);
 		}
 
 		public Color GetColor()

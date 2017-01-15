@@ -11,6 +11,7 @@ namespace ProfielWerkstuk.Scripts.GUI
 		public SpriteFont Font24;
 		public SpriteFont Font16;
 		public SpriteFont Font14;
+		public SpriteFont BoldFont16;
 		public readonly ProfielWerkstuk Game;
 		private BaseUserInterfaceState _uiState;
 

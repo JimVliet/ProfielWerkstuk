@@ -18,6 +18,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 		private IAlgorithm _currentAlgorithm;
 		private bool _allowDiagonal;
 		private bool _showArrows;
+		private bool _showInfoText;
 
 		private bool _paused;
 		public bool Paused
@@ -29,7 +30,8 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 
 				if (!value && DisplayerEndedAnimating)
 				{
-					Calculate(_currentAlgorithm.Type);
+					if(_currentAlgorithm != null)
+						Calculate(_currentAlgorithm.Type);
 				}
 			}
 		}
@@ -67,12 +69,14 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 			GetEventHandlers().CalculateDfs += CalculateDfs;
 			GetEventHandlers().CalculateGreedyBfs += CalculateGreedyBfs;
 			GetEventHandlers().CalculateAStar += CalculateAStar;
+			GetEventHandlers().ResetDisplayer += ResetDisplayer;
 
 			GetEventHandlers().DiagonalButtonClicked += DiagonalButtonClicked;
 			GetEventHandlers().PlayPauseButtonClicked += PlayPauseButtonClicked;
 			GetEventHandlers().PlayPauseEvent += PlayPauseEvent;
 			GetEventHandlers().ShowArrowsClicked += ShowArrowsClicked;
-			GetEventHandlers().ShowArrows += ShowArrows;
+			GetEventHandlers().ShowArrows += SetShowArrows;
+			GetEventHandlers().ShowInfoText += SetShowInfoText;
 		}
 
 		public int GetExplored()
@@ -182,12 +186,33 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 
 		private void ShowArrowsClicked()
 		{
+			if (_showArrows)
+			{
+				GetEventHandlers().ShowArrows?.Invoke(!_showArrows);
+				GetEventHandlers().ShowInfoText?.Invoke(!_showInfoText);
+				return;
+			}
+			if (_showInfoText)
+			{
+				GetEventHandlers().ShowInfoText?.Invoke(!_showInfoText);
+				return;
+			}
 			GetEventHandlers().ShowArrows?.Invoke(!_showArrows);
 		}
 
-		private void ShowArrows(bool showArrows)
+		private void SetShowArrows(bool showArrows)
 		{
 			_showArrows = showArrows;
+		}
+
+		private void SetShowInfoText(bool showInfo)
+		{
+			_showInfoText = showInfo;
+		}
+
+		public bool ShowInfoText()
+		{
+			return _showInfoText;
 		}
 
 		private EventHandlers GetEventHandlers()
@@ -223,6 +248,11 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 		private void CalculateAStar()
 		{
 			Calculate(AlgorithmType.AStar);
+		}
+
+		private void ResetDisplayer()
+		{
+			Displayer?.ResetDisplayer();
 		}
 	}
 
