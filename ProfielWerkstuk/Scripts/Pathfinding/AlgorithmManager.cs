@@ -70,6 +70,7 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 			GetEventHandlers().CalculateGreedyBfs += CalculateGreedyBfs;
 			GetEventHandlers().CalculateAStar += CalculateAStar;
 			GetEventHandlers().ResetDisplayer += ResetDisplayer;
+			GetEventHandlers().MapsizeChanged += MapSizeChanged;
 
 			GetEventHandlers().DiagonalButtonClicked += DiagonalButtonClicked;
 			GetEventHandlers().PlayPauseButtonClicked += PlayPauseButtonClicked;
@@ -253,6 +254,11 @@ namespace ProfielWerkstuk.Scripts.Pathfinding
 		private void ResetDisplayer()
 		{
 			Displayer?.ResetDisplayer();
+		}
+
+		private void MapSizeChanged(MapSize mapSize)
+		{
+			GetEventHandlers().ResetDisplayer?.Invoke();
 		}
 	}
 
